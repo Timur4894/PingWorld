@@ -51,7 +51,7 @@
 	<false/>
 	<key>UIAppFonts</key>
 	<array>
-		<string>DynaPuff-VariableFont_wdth,wght.ttf</string>
+		<string>DynaPuff.ttf</string>
 	</array>
 </dict>
 </plist>

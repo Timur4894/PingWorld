@@ -7,33 +7,37 @@ import GradientButton from '../../components/GradientButton';
 import InputField from '../../components/InputField';  
 
 
-export default function LoginScreen() {
+export default function SignUpScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Login'>>();
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
+  const [contact, setContact] = useState('');
 
-  const onLogin = () => {
-    if (!nickname.trim()) return;
-    navigation.replace('SendHello');
-  };
 
   return (
     <View style={styles.container}>
       <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
 
     <View style={{width: '100%'}}>
-     
+
+      
       <View style={styles.header}>
-        <Text style={styles.title}>Log in</Text>
-        <Image source={require('../../assets/img/Roket.png')}/>
+        <Text style={styles.title}>Your account</Text>
       </View>
       
       <View style={styles.formContainer}>
         <InputField
           label="Nickname"
-          placeholder="Enter your nickname"
+          placeholder="Paste your socials link here"
           value={nickname}
           onChangeText={setNickname}
+        />
+
+        <InputField
+          label="Contact link"
+          placeholder="Enter your contact link"
+          value={contact}
+          onChangeText={setContact}
         />
         
         <InputField
@@ -43,18 +47,19 @@ export default function LoginScreen() {
           value={password}
           onChangeText={setPassword}
         />
-        <TouchableOpacity onPress={() => navigation.replace('SignUpScreen')}>
-          <Text style={styles.signUpText}>
-            Don't have an account yet? <Text style={styles.signUpLink}>Sign up</Text>
-          </Text>
+    
+        <TouchableOpacity onPress={()=>{navigation.replace('Login')}}>
+            <Text style={styles.signUpText}>
+            Already have an account? <Text style={styles.signUpLink}>Log in</Text>
+            </Text>
         </TouchableOpacity>
        
       </View>
-    </View>      
+      </View>
 
       <GradientButton
-        title="Log in"
-        onPress={onLogin}
+        title="Save"
+        onPress={()=>{navigation.navigate('SendHello')}}
       />
     </View>
   );
@@ -64,7 +69,6 @@ const styles = StyleSheet.create({
   container: { 
     flex: 1, 
     justifyContent: 'space-between',
-    flexDirection: 'column',
     padding: 16, 
     paddingVertical: 60,
     alignItems: 'center',
@@ -76,11 +80,11 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    // flexDirection: 'row',
+    // alignItems: 'center',
+    // justifyContent: 'space-between',
     width: '100%',
-    marginTop: 60,
+    marginTop: 20,
     marginBottom: 40,
   },
   title: { 
