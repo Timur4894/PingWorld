@@ -1,7 +1,15 @@
 import React from "react";
-import { TextInput, StyleSheet, View, Text } from "react-native";
+import { TextInput, StyleSheet, View, Text, TextInputProps } from "react-native";
 
-const InputField = ({ label, placeholder, secureTextEntry, value, onChangeText }) => {
+interface InputFieldProps extends TextInputProps {
+  label?: string;
+  placeholder?: string;
+  secureTextEntry?: boolean;
+  value?: string;
+  onChangeText?: (text: string) => void;
+}
+
+const InputField = ({ label, placeholder, secureTextEntry = false, value, onChangeText, ...props }: InputFieldProps) => {
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
@@ -12,6 +20,7 @@ const InputField = ({ label, placeholder, secureTextEntry, value, onChangeText }
         secureTextEntry={secureTextEntry}
         value={value}
         onChangeText={onChangeText}
+        {...props}
       />
     </View>
   );

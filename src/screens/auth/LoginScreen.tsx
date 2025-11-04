@@ -1,20 +1,66 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import GradientButton from '../../components/GradientButton';
-import InputField from '../../components/InputField';  
+import InputField from '../../components/InputField';
+import { useAuth } from '../../context/AuthContext';  
 
 
 export default function LoginScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Login'>>();
+  const { login } = useAuth();
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onLogin = () => {
-    if (!nickname.trim()) return;
-    navigation.replace('SendHello');
+  const onLogin = async () => {
+    // Простая валидация полей
+    if (!nickname.trim()) {
+      Alert.alert('Ошибка', 'Пожалуйста, введите никнейм');
+      return;
+    }
+    
+    if (!password.trim()) {
+      Alert.alert('Ошибка', 'Пожалуйста, введите пароль');
+      return;
+    }
+
+    if (nickname.length < 3 || nickname.length > 20) {
+      Alert.alert('Ошибка', 'Никнейм должен содержать от 3 до 20 символов');
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert('Ошибка', 'Пароль должен содержать минимум 6 символов');
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      // Простая симуляция входа (без API)
+      const userData = {
+        id: Date.now().toString(), // Генерируем простой ID
+        nickname: nickname.trim(),
+        token: 'demo-token'
+      };
+
+      // Сохранение данных пользователя в контексте
+      await login(userData);
+
+      // Переход в приложение
+      navigation.replace('SendHello');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      Alert.alert(
+        'Ошибка входа', 
+        error.message || 'Произошла ошибка при входе'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -53,8 +99,9 @@ export default function LoginScreen() {
     </View>      
 
       <GradientButton
-        title="Log in"
+        title={isLoading ? "Вход..." : "Log in"}
         onPress={onLogin}
+        disabled={isLoading}
       />
     </View>
   );

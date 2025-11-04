@@ -34,7 +34,7 @@ export default function WellcomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, justifyContent: 'space-around', backgroundColor: "#303445", alignItems: 'center' },
+  container: { flex: 1, padding: 16, justifyContent: 'space-around', backgroundColor: "#1c1f29", alignItems: 'center' },
   title: { fontSize: 38, fontWeight: '800', textAlign: 'center', fontFamily: 'DynaPuff' , color: '#fff'},
   input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginVertical: 8 },
 });

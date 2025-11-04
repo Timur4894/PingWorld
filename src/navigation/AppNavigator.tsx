@@ -8,19 +8,37 @@ import SignUpScreen from '../screens/auth/SignUpScreen';
 import WellcomeScreen from '../screens/WellcomeScreen';
 import SettingsScreen from '../screens/main/SettingsScreen';
 import StatsScreen from '../screens/main/StatsScreen';
+import LoadingScreen from '../screens/LoadingScreen';
+import { useAuth } from '../context/AuthContext';
 
 export type RootStackParamList = {
+  Loading: undefined;
+  Wellcome: undefined;
   Login: undefined;
+  SignUpScreen: undefined;
   SendHello: undefined;
   ReceiveHello: undefined;
+  StatsScreen: undefined;
+  SettingsScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
+  const { isLoading, isAuthenticated } = useAuth();
+
+  // Show loading screen while checking authentication
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Wellcome" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator 
+        initialRouteName={isAuthenticated ? "SendHello" : "Wellcome"} 
+        screenOptions={{ headerShown: false }}
+      >
+        <Stack.Screen name="Loading" component={LoadingScreen} options={{ title: 'Loading' }} />
         <Stack.Screen name="Wellcome" component={WellcomeScreen} options={{ title: 'Wellcome' }} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Login' }} />
         <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ title: 'Sign Up' }} />

@@ -8,6 +8,7 @@ import InputField from '../../components/InputField';
 import BackSvg from '../../assets/svg/BackSvg';
 import FireSvg from '../../assets/svg/FireSvg';
 import EditSvg from '../../assets/svg/EditSvg';
+import CopySvg from '../../assets/svg/CopySvg';
 
 export default function SettingsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Login'>>();
@@ -19,18 +20,16 @@ export default function SettingsScreen() {
   return (
     <View style={styles.container}>
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '95%'}}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '95%', marginTop: 20}}>
         <TouchableOpacity onPress={()=>{navigation.goBack()}}>
           <BackSvg />
         </TouchableOpacity>
-
-        {/* <View style={{justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
-          <Text style={{fontSize: 22, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff', marginRight: 8}}>182</Text>
-          <FireSvg />
-        </View> */}
+       
       </View>
 
-      <Text style={{fontSize: 42, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff'}}>My Avatar</Text>
+      <Text style={{fontSize: 42, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff', textAlign: 'center'}}>
+        My avatar
+      </Text>
 
       <View style={{backgroundColor: '#383D4F', borderRadius: 25, padding: 16, width: '85%', alignItems: 'center'}}>
         <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
@@ -44,23 +43,26 @@ export default function SettingsScreen() {
         <Image source={require('../../assets/img/TEST.png')}/>
       </View>
 
-      <View style={{gap: 20}}>
-        <View style={{width: '85%', backgroundColor: '#383D4F', borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: '#303445', justifyContent: 'space-between', flexDirection: 'row'}}>
-          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff'}}>Tymur Latush</Text>
+      <View style={{}}>
+        <View style={{width: '85%', backgroundColor: '#383D4F', borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: '#303445', justifyContent: 'space-between', flexDirection: 'row', marginBottom: 12}}>
+          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff'}}>Your streak</Text>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff'}}>100</Text>
-            <FireSvg style={{marginLeft: 8, marginTop: -10}}/>
+            <Text style={{fontSize: 20, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff', marginRight: 8, }}>5</Text>
+            <FireSvg />
           </View>
+        </View>
+        <View style={{width: '85%', backgroundColor: '#383D4F', borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: '#303445', justifyContent: 'space-between', flexDirection: 'row', marginBottom: 12}}>
+          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff', textDecorationLine: 'underline'}}>https://t.me/kkutsen</Text>
+          <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}}>
+            <EditSvg style={{marginLeft: 8}}/>
+          </TouchableOpacity>
         </View>
 
-        <View style={{width: '85%', backgroundColor: '#383D4F', borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: '#303445', justifyContent: 'space-between', flexDirection: 'row'}}>
-          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff'}}>https://t.me/kkutsen</Text>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff'}}>100</Text>
-            <EditSvg style={{marginLeft: 8}}/>
-          </View>
-        </View>
+
       </View>
+
+      <Text style={{alignSelf: "center", fontSize: 14, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#D47483',  marginTop: 10}}>Delete account</Text>
+
 
     </View>
   );
