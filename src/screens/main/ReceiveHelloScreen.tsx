@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../navigation/AppNavigator';
+import { MainStackParamList } from '../../navigation/MainStack';
+import { Colors } from '../../constants/colors';
 import GradientButton from '../../components/GradientButton';
 import InputField from '../../components/InputField';  
 import BackSvg from '../../assets/svg/BackSvg';
@@ -11,7 +12,7 @@ import EditSvg from '../../assets/svg/EditSvg';
 import CopySvg from '../../assets/svg/CopySvg';
 
 export default function ReceiveHelloScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Login'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList, 'ReceiveHello'>>();
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
   const [contact, setContact] = useState('');
@@ -26,18 +27,18 @@ export default function ReceiveHelloScreen() {
         </TouchableOpacity>
 
         <View style={{justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
-          <Text style={{fontSize: 22, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff', marginRight: 8}}>182</Text>
+          <Text style={{fontSize: 22, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginRight: 8}}>182</Text>
           <FireSvg />
         </View>
       </View>
 
-      <Text style={{fontSize: 42, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff', textAlign: 'center'}}>King Von {'\n'} <Text style={{fontSize: 42, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#C5B7F4', textAlign: 'center'}}>Pinged You</Text></Text>
+      <Text style={{fontSize: 42, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>King Von {'\n'} <Text style={{fontSize: 42, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, textAlign: 'center'}}>Pinged You</Text></Text>
 
-      <View style={{backgroundColor: '#383D4F', borderRadius: 25, padding: 16, width: '85%', alignItems: 'center'}}>
+      <View style={{backgroundColor: Colors.cardBackground, borderRadius: 25, padding: 16, width: '85%', alignItems: 'center'}}>
         <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
 
         <View style={{flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start'}}>
-          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff'}}>Legendary</Text>
+          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>Legendary</Text>
           <Image source={require('../../assets/img/stars/Legendary.png')}/>
         </View>
 
@@ -46,14 +47,14 @@ export default function ReceiveHelloScreen() {
       </View>
 
       <View style={{marginBottom: 0}}>
-        <View style={{width: '85%', backgroundColor: '#383D4F', borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: '#303445', justifyContent: 'space-between', flexDirection: 'row'}}>
-          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff', textDecorationLine: 'underline'}}>https://t.me/kkutsen</Text>
+        <View style={{width: '85%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row'}}>
+          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textDecorationLine: 'underline'}}>https://t.me/kkutsen</Text>
           <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}}>
             <CopySvg style={{marginLeft: 8}}/>
           </TouchableOpacity>
         </View>
 
-        <Text style={{alignSelf: "center", fontSize: 14, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#D47483',  marginTop: 10}}>Report link or user</Text>
+        <Text style={{alignSelf: "center", fontSize: 14, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError,  marginTop: 10}}>Report link or user</Text>
 
       </View>
 
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     padding: 16, 
     alignItems: 'center',
-    backgroundColor: "#272B38",
+    backgroundColor: Colors.backgroundSettings,
   },
   backgroundImage: {
     position: 'absolute',
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
     fontSize: 38, 
     fontWeight: '800', 
     fontFamily: 'DynaPuff',
-    color: '#fff',
+    color: Colors.textPrimary,
   },
   formContainer: {
     flex: 1,
@@ -100,14 +101,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   signUpText: {
-    color: '#fff',
+    color: Colors.textPrimary,
     textAlign: 'center',
     marginTop: 20,
     fontSize: 16,
     fontFamily: 'DynaPuff',
   },
   signUpLink: {
-    color: '#C5B7F4',
+    color: Colors.textAccent,
     fontWeight: 'bold',
   },
 });

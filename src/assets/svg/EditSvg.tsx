@@ -1,6 +1,12 @@
 import * as React from "react"
 import Svg, { SvgProps, Path } from "react-native-svg"
-const SvgComponent = (props: SvgProps) => (
+import { Colors } from "../../constants/colors"
+
+interface EditSvgProps extends SvgProps {
+  stroke?: string;
+}
+
+const SvgComponent = ({ stroke = Colors.accent, ...props }: EditSvgProps) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
     width={20}
@@ -9,7 +15,7 @@ const SvgComponent = (props: SvgProps) => (
     {...props}
   >
     <Path
-      stroke="#C5B7F4"
+      stroke={stroke}
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={1.5}

@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, Image, Animated, Alert } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import { Colors } from '../../constants/colors';
 
 interface PingButtonProps {
   onPingSent: () => void;
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#C5B7F4',
+    backgroundColor: Colors.accent,
     borderRadius: 2,
   },
   progressText: {
@@ -179,7 +180,7 @@ const styles = StyleSheet.create({
     bottom: -30,
     fontSize: 14,
     fontFamily: 'DynaPuff',
-    color: '#C5B7F4',
+    color: Colors.textAccent,
     fontWeight: 'bold',
   },
 });

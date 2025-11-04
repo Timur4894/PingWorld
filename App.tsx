@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
 import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import AppNavigator from './src/navigation/AppNavigator';
@@ -16,11 +9,12 @@ function App() {
 
   return (
     <AuthProvider>
-      <View style={styles.container}>
+       <View style={styles.container}>
         <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
         <AppNavigator />
       </View>
     </AuthProvider>
+     
   );
 }
 

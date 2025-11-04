@@ -1,6 +1,7 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
 import { LinearGradient } from "react-native-linear-gradient";
+import { Colors } from "../constants/colors";
 
 interface GradientButtonProps {
   title: string;
@@ -17,7 +18,7 @@ const GradientButton = ({ title, onPress, disabled = false }: GradientButtonProp
       disabled={disabled}
     >
       <LinearGradient
-        colors={disabled ? ["#4a4a4a", "#6a6a6a"] : ["#2a2a72", "#9f8be3"]}
+        colors={disabled ? [Colors.disabledLight, Colors.disabledDark] : [Colors.gradientStart, Colors.gradientEnd]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.gradient}
@@ -37,7 +38,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     alignSelf: "center",
     borderWidth: 1,
-    borderColor: '#353476',
+    borderColor: Colors.borderButton,
   },
   gradient: {
     borderRadius: 25,
@@ -45,7 +46,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   text: {
-    color: "#fff",
+    color: Colors.textPrimary,
     fontFamily: 'DynaPuff',
     paddingVertical: 17,
     fontSize: 18,

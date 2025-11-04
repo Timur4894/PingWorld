@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Image } from 'react-native';
+import { Colors } from '../constants/colors';
 
 export default function LoadingScreen() {
   return (
@@ -8,7 +9,7 @@ export default function LoadingScreen() {
       
       <View style={styles.content}>
         <Text style={styles.title}>PingWorld</Text>
-        <ActivityIndicator size="large" color="#C5B7F4" style={styles.spinner} />
+        <ActivityIndicator size="large" color={Colors.accent} style={styles.spinner} />
         <Text style={styles.subtitle}>Loading...</Text>
       </View>
     </View>
@@ -18,7 +19,7 @@ export default function LoadingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1c1f29",
+    backgroundColor: Colors.background,
   },
   backgroundImage: {
     position: 'absolute',
@@ -34,7 +35,7 @@ const styles = StyleSheet.create({
     fontSize: 42,
     fontWeight: 'bold',
     fontFamily: 'DynaPuff',
-    color: '#fff',
+    color: Colors.textPrimary,
     marginBottom: 40,
   },
   spinner: {
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 18,
     fontFamily: 'DynaPuff',
-    color: '#C5B7F4',
+    color: Colors.textAccent,
     fontWeight: '600',
   },
 });

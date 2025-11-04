@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../navigation/AppNavigator';
+import { MainStackParamList } from '../../navigation/MainStack';
+import { Colors } from '../../constants/colors';
 import GradientButton from '../../components/GradientButton';
 import InputField from '../../components/InputField';  
 import FireSvg from '../../assets/svg/FireSvg';
@@ -11,24 +12,22 @@ import FadeInView from '../../components/Animated/FadeInView';
 import AnimatedButton from '../../components/Animated/AnimatedButton';
 import AnimatedCard from '../../components/Animated/AnimatedCard';
 import PulseView from '../../components/Animated/PulseView';
+import leaderboardApi from '../../api/leaderboardApi';
 
-
-interface LeaderboardEntry {
-  id: string;
-  nickname: string;
-  current_streak: number;
-  total_pings?: number;
-  rank?: number;
+interface Avatar {
+  url: string;
+  rarity: string;
 }
 
-interface LeaderboardData {
-  data: LeaderboardEntry[];
-  total_users?: number;
-  timestamp?: string;
+interface LeaderboardEntry {
+  nickname: string;
+  country: string;
+  avatar: Avatar;
+  current_streak: number;
 }
 
 export default function StatsScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'StatsScreen'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList, 'StatsScreen'>>();
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [totalUsers, setTotalUsers] = useState<number>(0);
   const [loading, setLoading] = useState(true);
@@ -40,32 +39,30 @@ export default function StatsScreen() {
   const fetchLeaderboard = async () => {
     try {
       setLoading(true);
-      // Создаем демо-данные для лидерборда
-      const response = {
-        data: [
-          { id: '1', nickname: 'DemoUser1', current_streak: 15, avatar: 'elephant' },
-          { id: '2', nickname: 'DemoUser2', current_streak: 12, avatar: 'lion' },
-          { id: '3', nickname: 'DemoUser3', current_streak: 10, avatar: 'tiger' },
-          { id: '4', nickname: 'DemoUser4', current_streak: 8, avatar: 'bear' },
-          { id: '5', nickname: 'DemoUser5', current_streak: 6, avatar: 'fox' }
-        ]
-      };
+      const response = await leaderboardApi.getLeaderboard(20);
       
-      // Handle different possible response structures
-      if (response.data) {
-        setLeaderboard(response.data);
-        setTotalUsers(response.data.length);
-      } else if (Array.isArray(response)) {
-        setLeaderboard(response);
-        setTotalUsers(response.length);
-      } else {
-        setLeaderboard([]);
-        setTotalUsers(0);
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to load leaderboard';
-      Alert.alert('Error', errorMessage);
+      const responseData = response.data?.data || response.data;
+      const entries = responseData?.entries || responseData || [];
+      
+      setLeaderboard(entries);
+      setTotalUsers(entries.length);
+    } catch (error: any) {
       console.error('Leaderboard fetch error:', error);
+      let errorMessage = 'Failed to load leaderboard';
+      
+      if (error.response) {
+        const status = error.response.status;
+        const data = error.response.data;
+        errorMessage = data?.message || data?.error || `Error: ${status}`;
+      } else if (error.request) {
+        errorMessage = 'Network error. Please check your connection';
+      } else {
+        errorMessage = error.message || 'An error occurred';
+      }
+      
+      Alert.alert('Error', errorMessage);
+      setLeaderboard([]);
+      setTotalUsers(0);
     } finally {
       setLoading(false);
     }
@@ -76,8 +73,8 @@ export default function StatsScreen() {
     return (
       <View style={[styles.container, { justifyContent: 'center' }]}>
         <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
-        <ActivityIndicator size="large" color="#C5B7F4" />
-        <Text style={{fontSize: 18, fontFamily: 'DynaPuff', color: '#fff', marginTop: 20}}>Loading leaderboard...</Text>
+        <ActivityIndicator size="large" color={Colors.accent} />
+        <Text style={{fontSize: 18, fontFamily: 'DynaPuff', color: Colors.textPrimary, marginTop: 20}}>Loading leaderboard...</Text>
       </View>
     );
   }
@@ -95,9 +92,9 @@ export default function StatsScreen() {
       </FadeInView>
 
       <FadeInView delay={200} direction="up">
-        <Text style={{fontSize:32, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff', marginBottom: 50, textAlign: 'center'}}>
+          <Text style={{fontSize:32, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginBottom: 50, textAlign: 'center'}}>
           Already <PulseView scale={1.05} duration={2500}>
-            <Text style={{fontSize:32, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#C5B7F4', marginBottom: -10}}>
+            <Text style={{fontSize:32, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, marginBottom: -10}}>
               {totalUsers}
             </Text>
           </PulseView> people have pinged at least once!
@@ -105,24 +102,34 @@ export default function StatsScreen() {
       </FadeInView>
 
       <FadeInView delay={400} direction="up" style={{marginLeft: 16}}>
-        <Text style={{fontSize:22, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff', marginBottom: 20}}>Top pingers</Text>
+        <Text style={{fontSize:22, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginBottom: 20}}>Top pingers</Text>
       </FadeInView>
       
-      <View style={{gap: 12, width: '100%', paddingHorizontal: 16}}>
+      <View style={{gap: 12, width: '100%', paddingHorizontal: 16, marginBottom: 50}}>
         {leaderboard.length > 0 ? (
           leaderboard.map((entry, index) => (    
-            <AnimatedCard key={entry.id || index} delay={600 + (index * 200)} pressable={true}>
-              <View style={{width: '100%', backgroundColor: '#383D4F', borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: '#303445', justifyContent: 'space-between', flexDirection: 'row'}}>
+            <AnimatedCard key={`${entry.nickname}-${index}`} delay={600 + (index * 200)} pressable={true}>
+              <View style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row'}}>
                 <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
-                  <Text style={{fontSize: 18, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#C5B7F4', marginRight: 12, minWidth: 30}}>
+                  <Text style={{fontSize: 18, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, marginRight: 12, minWidth: 30}}>
                     #{index + 1}
                   </Text>
-                  <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff', flex: 1}}>
+                  {entry.avatar.rarity === 'legendary' && (
+                    <Image source={require('../../assets/img/stars/Legendary.png')}/>
+                      )}
+                  {entry.avatar.rarity === 'rare' && (
+                    <Image source={require('../../assets/img/stars/Rare.png')}/>
+                      )}
+                  {entry.avatar.rarity === 'common' && (
+                    <Image source={require('../../assets/img/stars/Common.png')}/>
+                      )}
+     
+                  <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, flex: 1}}>
                     {entry.nickname}
                   </Text>
                 </View>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff'}}>
+                  <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>
                     {entry.current_streak}
                   </Text>
                   <FireSvg style={{marginLeft: 8, marginTop: -10}}/>
@@ -132,8 +139,8 @@ export default function StatsScreen() {
           ))
         ) : (
           <FadeInView delay={600} direction="up">
-            <View style={{width: '100%', backgroundColor: '#383D4F', borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: '#303445', justifyContent: 'center'}}>
-              <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff', textAlign: 'center'}}>
+            <View style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'center'}}>
+              <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>
                 No leaderboard data available
               </Text>
             </View>
@@ -151,7 +158,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     // padding: 16, 
     // alignItems: 'center',
-    backgroundColor: "#1c1f29",
+    backgroundColor: Colors.background,
   },
   backgroundImage: {
     position: 'absolute',
@@ -170,7 +177,7 @@ const styles = StyleSheet.create({
     fontSize: 38, 
     fontWeight: '800', 
     fontFamily: 'DynaPuff',
-    color: '#fff',
+    color: Colors.textPrimary,
   },
   formContainer: {
     flex: 1,
@@ -179,14 +186,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   signUpText: {
-    color: '#fff',
+    color: Colors.textPrimary,
     textAlign: 'center',
     marginTop: 20,
     fontSize: 16,
     fontFamily: 'DynaPuff',
   },
   signUpLink: {
-    color: '#C5B7F4',
+    color: Colors.textAccent,
     fontWeight: 'bold',
   },
 });

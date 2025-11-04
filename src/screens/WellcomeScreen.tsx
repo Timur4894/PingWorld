@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { AuthStackParamList } from '../navigation/AuthStack';
 import GradientButton from '../components/GradientButton';
+import { Colors } from '../constants/colors';
 
 
 export default function WellcomeScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Wellcome'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList, 'Wellcome'>>();
 
 
   return (
@@ -23,7 +24,7 @@ export default function WellcomeScreen() {
    
         <Image source={require('../assets/img/Onboard.png')}/>
 
-        <Text style={{fontSize: 22, fontWeight: '400', textAlign: 'center', fontFamily: 'DynaPuff' , color: '#fff'}}>Send random hellos and surprise someone new today!</Text>
+        <Text style={{fontSize: 22, fontWeight: '400', textAlign: 'center', fontFamily: 'DynaPuff' , color: Colors.textPrimary}}>Send random hellos and surprise someone new today!</Text>
 
         <GradientButton
             title="Continue"
@@ -34,8 +35,8 @@ export default function WellcomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, justifyContent: 'space-around', backgroundColor: "#1c1f29", alignItems: 'center' },
-  title: { fontSize: 38, fontWeight: '800', textAlign: 'center', fontFamily: 'DynaPuff' , color: '#fff'},
+  container: { flex: 1, padding: 16, justifyContent: 'space-around', backgroundColor: Colors.background, alignItems: 'center' },
+  title: { fontSize: 38, fontWeight: '800', textAlign: 'center', fontFamily: 'DynaPuff' , color: Colors.textPrimary},
   input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginVertical: 8 },
 });
 

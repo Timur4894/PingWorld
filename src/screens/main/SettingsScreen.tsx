@@ -1,21 +1,67 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../navigation/AppNavigator';
+import { MainStackParamList } from '../../navigation/MainStack';
+import { Colors } from '../../constants/colors';
 import GradientButton from '../../components/GradientButton';
 import InputField from '../../components/InputField';  
 import BackSvg from '../../assets/svg/BackSvg';
 import FireSvg from '../../assets/svg/FireSvg';
 import EditSvg from '../../assets/svg/EditSvg';
 import CopySvg from '../../assets/svg/CopySvg';
+import userManagementApi from '../../api/UserManagementApi';
+import { useAuth } from '../../context/AuthContext';
 
 export default function SettingsScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Login'>>();
-  const [nickname, setNickname] = useState('');
-  const [password, setPassword] = useState('');
-  const [contact, setContact] = useState('');
+  const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList, 'SettingsScreen'>>();
+  const [userData, setUserData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { user, loading, logout, deleteAccount } = useAuth();
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account',
+      'Are you sure you want to delete your account? This action cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setIsDeleting(true);
+              await deleteAccount();
+            } catch (error: any) {
+              let errorMessage = 'Failed to delete account';
+              
+              if (error.response) {
+                const status = error.response.status;
+                const data = error.response.data;
+                errorMessage = data?.message || data?.error || `Error: ${status}`;
+              } else if (error.request) {
+                errorMessage = 'Network error. Please check your connection';
+              } else {
+                errorMessage = error.message || 'An error occurred';
+              }
+              
+              Alert.alert('Error', errorMessage);
+            } finally {
+              setIsDeleting(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+  
+  if (loading) {
+    return <ActivityIndicator size="large" color={Colors.textPrimary} />;
+  }
 
   return (
     <View style={styles.container}>
@@ -27,32 +73,34 @@ export default function SettingsScreen() {
        
       </View>
 
-      <Text style={{fontSize: 42, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff', textAlign: 'center'}}>
+      <Text style={{fontSize: 42, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>
         My avatar
       </Text>
 
-      <View style={{backgroundColor: '#383D4F', borderRadius: 25, padding: 16, width: '85%', alignItems: 'center'}}>
+      <View style={{backgroundColor: Colors.cardBackground, borderRadius: 25, padding: 16, width: '85%', alignItems: 'center'}}>
         <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
 
         <View style={{flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start'}}>
-          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff'}}>Legendary</Text>
-          <Image source={require('../../assets/img/stars/Legendary.png')}/>
+          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>{user.avatar.rarity}</Text>
+          {user.avatar.rarity === 'legendary' && <Image source={require('../../assets/img/stars/Legendary.png')}/>}
+          {user.avatar.rarity === 'rare' && <Image source={require('../../assets/img/stars/Rare.png')}/>}
+          {user.avatar.rarity === 'common' && <Image source={require('../../assets/img/stars/Common.png')}/>}
         </View>
 
         
-        <Image source={require('../../assets/img/TEST.png')}/>
+        <Image source={{uri: user.avatar.url}} style={{width: 200, height: 300, borderRadius: 50}}/>
       </View>
 
       <View style={{}}>
-        <View style={{width: '85%', backgroundColor: '#383D4F', borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: '#303445', justifyContent: 'space-between', flexDirection: 'row', marginBottom: 12}}>
-          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff'}}>Your streak</Text>
+        <View style={{width: '85%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row', marginBottom: 12}}>
+          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>Your streak</Text>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={{fontSize: 20, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff', marginRight: 8, }}>5</Text>
+            <Text style={{fontSize: 20, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginRight: 8, }}>{user.current_streak}</Text>
             <FireSvg />
           </View>
         </View>
-        <View style={{width: '85%', backgroundColor: '#383D4F', borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: '#303445', justifyContent: 'space-between', flexDirection: 'row', marginBottom: 12}}>
-          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#fff', textDecorationLine: 'underline'}}>https://t.me/kkutsen</Text>
+        <View style={{width: '85%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row', marginBottom: 12}}>
+          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textDecorationLine: 'underline'}}>{user.contacts[0].url}</Text>
           <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}}>
             <EditSvg style={{marginLeft: 8}}/>
           </TouchableOpacity>
@@ -60,8 +108,17 @@ export default function SettingsScreen() {
 
 
       </View>
-
-      <Text style={{alignSelf: "center", fontSize: 14, fontWeight: 'bold', fontFamily: 'DynaPuff', color: '#D47483',  marginTop: 10}}>Delete account</Text>
+      
+      <TouchableOpacity 
+        onPress={handleDeleteAccount}
+        disabled={isDeleting}
+      >
+        {isDeleting ? (
+          <ActivityIndicator size="small" color={Colors.textError} />
+        ) : (
+          <Text style={{alignSelf: "center", fontSize: 14, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError,  marginTop: 10}}>Delete account</Text>
+        )}
+      </TouchableOpacity>
 
 
     </View>
@@ -74,7 +131,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     padding: 16, 
     alignItems: 'center',
-    backgroundColor: "#272B38",
+    backgroundColor: Colors.backgroundSettings,
   },
   backgroundImage: {
     position: 'absolute',
@@ -93,7 +150,7 @@ const styles = StyleSheet.create({
     fontSize: 38, 
     fontWeight: '800', 
     fontFamily: 'DynaPuff',
-    color: '#fff',
+    color: Colors.textPrimary,
   },
   formContainer: {
     flex: 1,
@@ -102,14 +159,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   signUpText: {
-    color: '#fff',
+    color: Colors.textPrimary,
     textAlign: 'center',
     marginTop: 20,
     fontSize: 16,
     fontFamily: 'DynaPuff',
   },
   signUpLink: {
-    color: '#C5B7F4',
+    color: Colors.textAccent,
     fontWeight: 'bold',
   },
 });
