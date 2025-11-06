@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../navigation/MainStack';
@@ -13,6 +13,9 @@ import AnimatedButton from '../../components/Animated/AnimatedButton';
 import AnimatedCard from '../../components/Animated/AnimatedCard';
 import PulseView from '../../components/Animated/PulseView';
 import leaderboardApi from '../../api/leaderboardApi';
+import { useModal } from '../../context/ModalContext';
+import { StatsSkeleton } from '../../components/Skeleton/SkeletonScreen';
+import { getCountryFlag } from '../../utils/countryUtils';
 
 interface Avatar {
   url: string;
@@ -28,6 +31,7 @@ interface LeaderboardEntry {
 
 export default function StatsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList, 'StatsScreen'>>();
+  const { showModal } = useModal();
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [totalUsers, setTotalUsers] = useState<number>(0);
   const [loading, setLoading] = useState(true);
@@ -60,7 +64,11 @@ export default function StatsScreen() {
         errorMessage = error.message || 'An error occurred';
       }
       
-      Alert.alert('Error', errorMessage);
+      showModal({
+        title: 'Error',
+        message: errorMessage,
+        type: 'error',
+      });
       setLeaderboard([]);
       setTotalUsers(0);
     } finally {
@@ -70,13 +78,7 @@ export default function StatsScreen() {
 
 
   if (loading) {
-    return (
-      <View style={[styles.container, { justifyContent: 'center' }]}>
-        <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
-        <ActivityIndicator size="large" color={Colors.accent} />
-        <Text style={{fontSize: 18, fontFamily: 'DynaPuff', color: Colors.textPrimary, marginTop: 20}}>Loading leaderboard...</Text>
-      </View>
-    );
+    return <StatsSkeleton />;
   }
 
   return (
@@ -109,7 +111,9 @@ export default function StatsScreen() {
         {leaderboard.length > 0 ? (
           leaderboard.map((entry, index) => (    
             <AnimatedCard key={`${entry.nickname}-${index}`} delay={600 + (index * 200)} pressable={true}>
+              {/* <TouchableOpacity onPress={()=>{navigation.navigate('ReceiveHello', {ping: entry, showPingButton: false})}} style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row'}}> */}
               <View style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row'}}>
+
                 <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
                   <Text style={{fontSize: 18, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, marginRight: 12, minWidth: 30}}>
                     #{index + 1}
@@ -127,6 +131,9 @@ export default function StatsScreen() {
                   <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, flex: 1}}>
                     {entry.nickname}
                   </Text>
+                  {entry.country && getCountryFlag(entry.country) && (
+                    <Text style={{fontSize: 18, marginLeft: 8}}>{getCountryFlag(entry.country)}</Text>
+                  )}
                 </View>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>

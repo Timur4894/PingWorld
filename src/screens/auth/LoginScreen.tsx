@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/AuthStack';
@@ -7,11 +7,13 @@ import GradientButton from '../../components/GradientButton';
 import InputField from '../../components/InputField';
 import { Colors } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
+import { useModal } from '../../context/ModalContext';
 
 
 export default function LoginScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList, 'Login'>>();
   const { login } = useAuth();
+  const { showModal } = useModal();
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -19,12 +21,20 @@ export default function LoginScreen() {
   const onLogin = async () => {
     // Валидация полей
     if (!nickname.trim()) {
-      Alert.alert('Error', 'Please enter your nickname');
+      showModal({
+        title: 'Error',
+        message: 'Please enter your nickname',
+        type: 'error',
+      });
       return;
     }
     
     if (!password.trim()) {
-      Alert.alert('Error', 'Please enter your password');
+      showModal({
+        title: 'Error',
+        message: 'Please enter your password',
+        type: 'error',
+      });
       return;
     }
 
@@ -59,7 +69,11 @@ export default function LoginScreen() {
         errorMessage = error.message || 'An error occurred';
       }
       
-      Alert.alert('Login Error', errorMessage);
+      showModal({
+        title: 'Login Error',
+        message: errorMessage,
+        type: 'error',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -101,7 +115,7 @@ export default function LoginScreen() {
     </View>      
 
       <GradientButton
-        title={isLoading ? "Вход..." : "Log in"}
+        title={isLoading ? "Login..." : "Log in"}
         onPress={onLogin}
         disabled={isLoading}
       />

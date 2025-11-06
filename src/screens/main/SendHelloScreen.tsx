@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../navigation/MainStack';
@@ -14,15 +14,26 @@ import PingButton from '../../components/Animated/PingButton';
 import { Colors } from '../../constants/colors';
 import pingApi from '../../api/pingApi';
 import streakApi from '../../api/streakApi';
+import { useModal } from '../../context/ModalContext';
+import { SendHelloSkeleton } from '../../components/Skeleton/SkeletonScreen';
 
 interface PingEntry {
   id?: string;
   sender_nickname: string;
-  sender_id?: string;
+  sender_id: string;
+  sender_avatar: {
+    url: string;
+    rarity: 'common' | 'rare' | 'legendary';
+  };
+  sender_contacts?: Array<{
+    title: string;
+    url: string;
+  }>;
 }
 
 export default function SendHelloScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList, 'SendHello'>>();
+  const { showModal } = useModal();
   
   const [receivedPings, setReceivedPings] = useState<PingEntry[]>([]);
   const [currentStreak, setCurrentStreak] = useState<number>(0);
@@ -70,7 +81,11 @@ export default function SendHelloScreen() {
       setSendingPing(true);
       await pingApi.sendPing();
       await fetchUserStreak();
-      Alert.alert('Success', 'Ping sent successfully!');
+      showModal({
+        title: 'Success',
+        message: 'Ping sent successfully!',
+        type: 'success',
+      });
     } catch (error: any) {
       console.error('Error sending ping:', error);
       let errorMessage = 'Failed to send ping';
@@ -85,7 +100,11 @@ export default function SendHelloScreen() {
         errorMessage = error.message || 'An error occurred';
       }
       
-      Alert.alert('Error', errorMessage);
+      showModal({
+        title: 'Error',
+        message: errorMessage,
+        type: 'error',
+      });
     } finally {
       setSendingPing(false);
     }
@@ -98,12 +117,7 @@ export default function SendHelloScreen() {
   const displayPings = showAll ? receivedPings : receivedPings.slice(0, 2);
 
   if (loading) {
-    return (
-      <View style={[styles.container, { justifyContent: 'center' }]}>
-        <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
-        <ActivityIndicator size="large" color={Colors.accent} />
-      </View>
-    );
+    return <SendHelloSkeleton />;
   }
 
   return (
@@ -140,10 +154,8 @@ export default function SendHelloScreen() {
         <View style={{alignItems: 'center', gap: 30}}>
           <FadeInView delay={600} direction="up">
               <Text style={{fontSize: 18, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>
-              Pings left today:  
-              <Text style={{fontSize: 18, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent}}>
-                {pingsRemaining}
-              </Text>
+             You can send up to 5 pings per day
+              
             </Text>
           </FadeInView>
           <FadeInView delay={800} direction="up">
@@ -151,7 +163,6 @@ export default function SendHelloScreen() {
               <PingButton 
                 onPingSent={handlePingSent}
                 disabled={pingsRemaining === 0 || sendingPing}
-                pingsRemaining={pingsRemaining}
               />
             </PulseView>
           </FadeInView>
@@ -168,12 +179,11 @@ export default function SendHelloScreen() {
             </FadeInView>
 
             {displayPings.map((ping, index) => (
-              <AnimatedCard key={ping.id || index} delay={1400 + (index * 200)} pressable={true} onPress={()=>{navigation.navigate('ReceiveHello')}}>
+              <AnimatedCard key={ping.id || index} delay={1400 + (index * 200)} pressable={true} onPress={()=>{navigation.navigate('ReceiveHello', {ping})}}>
                 <View style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row', marginBottom: 10}}>
                   <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>{ping.sender_nickname}</Text>
-                  <AnimatedButton onPress={()=>{navigation.navigate('ReceiveHello')}}>
+                
                     <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, }}>view profile</Text>
-                  </AnimatedButton>
                 </View>
               </AnimatedCard>
             ))}

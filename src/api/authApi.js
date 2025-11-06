@@ -1,8 +1,8 @@
 import axiosClient from './axiosClient';
 
 const authApi = {
-  signup: (nickname, password, contacts) =>
-    axiosClient.post('/api/v1/auth/signup', { nickname, password, contacts }),
+  signup: (nickname, password, contacts, country) =>
+    axiosClient.post('/api/v1/auth/signup', { nickname, password, contacts, country }),
 
   login: (nickname, password) =>
     axiosClient.post('/api/v1/auth/login', { nickname, password }),

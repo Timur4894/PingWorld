@@ -2,6 +2,9 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import authApi from '../api/authApi';
 import userManagementApi from '../api/UserManagementApi';
+import { clearTokens } from '../api/axiosClient';
+
+const TOKEN_KEY = 'auth_token';
 
 const AuthContext = createContext();
 
@@ -12,10 +15,11 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const init = async () => {
       try {
-        const cookies = await AsyncStorage.getItem('cookies');
-        console.log('AuthContext init - cookies from storage:', cookies);
+        const token = await AsyncStorage.getItem(TOKEN_KEY);
+        console.log('AuthContext init - token from storage:', token ? '✅ ЕСТЬ' : '❌ ОТСУТСТВУЕТ');
         
-        if (cookies) {
+        if (token) {
+          console.log('Token found in storage, checking validity...');
           try {
             const response = await userManagementApi.getMe();
             console.log('AuthContext init - getMe response:', response.data);
@@ -23,19 +27,22 @@ export const AuthProvider = ({ children }) => {
           } catch (error) {
             console.error('AuthContext init - getMe failed:', error.response?.status, error.response?.data);
             if (error.response?.status === 401) {
-              await AsyncStorage.removeItem('cookies');
+              console.log('401 error in init - clearing invalid token');
+              await clearTokens();
               setUser(null);
             } else {
-              throw error;
+              console.log('Non-401 error in init - keeping token, may be temporary network issue');
+              setUser(null);
             }
           }
         } else {
+          console.log('No token found in storage');
           setUser(null);
         }
       } catch (error) {
         console.error('AuthContext init error:', error);
         setUser(null);
-        await AsyncStorage.removeItem('cookies');
+        console.log('Error in init - NOT clearing token, may be temporary issue');
       } finally {
         setLoading(false);
       }
@@ -45,19 +52,42 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (nickname, password) => {
     try {
+      console.log('🔐 Starting login...');
       const response = await authApi.login(nickname, password);
-      console.log('Login response:', response.data);
+      console.log('✅ Login response received:', response.data);
+      
+      // Токен автоматически сохраняется в axiosClient interceptor
+      // Проверяем, что токен был сохранен
+      const tokenAfterLogin = await AsyncStorage.getItem(TOKEN_KEY);
+      console.log('🔑 Token после логина:', tokenAfterLogin ? '✅ ЕСТЬ' : '❌ ОТСУТСТВУЕТ');
+      
+      if (!tokenAfterLogin) {
+        console.error('❌ КРИТИЧЕСКАЯ ОШИБКА: Token не был сохранен после логина!');
+        throw new Error('Token не был сохранен после логина');
+      }
       
       const userData = response.data?.data?.user || response.data?.user || response.data?.data;
       
       if (userData) {
         setUser(userData);
+        console.log('👤 User set from login response');
       } else {
-        const userResponse = await userManagementApi.getMe();
-        setUser(userResponse.data?.data || userResponse.data);
+        console.log('⚠️ User data not in login response, fetching via getMe()...');
+        try {
+          const userResponse = await userManagementApi.getMe();
+          console.log('✅ getMe() после логина успешен:', userResponse.data);
+          setUser(userResponse.data?.data || userResponse.data);
+        } catch (getMeError) {
+          console.error('❌ getMe() после логина провалился:', getMeError.response?.status);
+          console.error('   Это означает, что token не работает!');
+          // Проверяем token еще раз
+          const tokenCheck = await AsyncStorage.getItem(TOKEN_KEY);
+          console.error('   Token в AsyncStorage при ошибке:', tokenCheck ? '✅ ЕСТЬ' : '❌ ОТСУТСТВУЕТ');
+          throw getMeError;
+        }
       }
     } catch (error) {
-      console.error('Login error details:', {
+      console.error('❌ Login error details:', {
         message: error.message,
         response: error.response?.data,
         status: error.response?.status,
@@ -66,21 +96,44 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signup = async (nickname, password, contacts) => {
+  const signup = async (nickname, password, contacts, country) => {
     try {
-      const response = await authApi.signup(nickname, password, contacts);
-      console.log('Signup response:', response.data);
+      console.log('📝 Starting signup...');
+      const response = await authApi.signup(nickname, password, contacts, country);
+      console.log('✅ Signup response received:', response.data);
+      
+      // Токен автоматически сохраняется в axiosClient interceptor
+      // Проверяем, что токен был сохранен
+      const tokenAfterSignup = await AsyncStorage.getItem(TOKEN_KEY);
+      console.log('🔑 Token после регистрации:', tokenAfterSignup ? '✅ ЕСТЬ' : '❌ ОТСУТСТВУЕТ');
+      
+      if (!tokenAfterSignup) {
+        console.error('❌ КРИТИЧЕСКАЯ ОШИБКА: Token не был сохранен после регистрации!');
+        throw new Error('Token не был сохранен после регистрации');
+      }
       
       const userData = response.data?.data?.user || response.data?.user || response.data?.data;
       
       if (userData) {
         setUser(userData);
+        console.log('👤 User set from signup response');
       } else {
-        const userResponse = await userManagementApi.getMe();
-        setUser(userResponse.data?.data || userResponse.data);
+        console.log('⚠️ User data not in signup response, fetching via getMe()...');
+        try {
+          const userResponse = await userManagementApi.getMe();
+          console.log('✅ getMe() после регистрации успешен:', userResponse.data);
+          setUser(userResponse.data?.data || userResponse.data);
+        } catch (getMeError) {
+          console.error('❌ getMe() после регистрации провалился:', getMeError.response?.status);
+          console.error('   Это означает, что token не работает!');
+          // Проверяем token еще раз
+          const tokenCheck = await AsyncStorage.getItem(TOKEN_KEY);
+          console.error('   Token в AsyncStorage при ошибке:', tokenCheck ? '✅ ЕСТЬ' : '❌ ОТСУТСТВУЕТ');
+          throw getMeError;
+        }
       }
     } catch (error) {
-      console.error('Signup error details:', {
+      console.error('❌ Signup error details:', {
         message: error.message,
         response: error.response?.data,
         status: error.response?.status,
@@ -95,7 +148,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      await AsyncStorage.removeItem('cookies');
+      await clearTokens();
       setUser(null);
     }
   };
@@ -103,7 +156,7 @@ export const AuthProvider = ({ children }) => {
   const deleteAccount = async () => {
     try {
       await userManagementApi.deleteMe();
-      await AsyncStorage.removeItem('cookies');
+      await clearTokens();
       setUser(null);
     } catch (error) {
       console.error('Delete account error:', error);
@@ -111,8 +164,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const refreshUser = async () => {
+    try {
+      const response = await userManagementApi.getMe();
+      const userData = response.data?.data || response.data;
+      setUser(userData);
+      return userData;
+    } catch (error) {
+      console.error('Error refreshing user:', error);
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, loading, deleteAccount }}>
+    <AuthContext.Provider value={{ user, login, signup, logout, loading, deleteAccount, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

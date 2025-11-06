@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, StyleSheet, Image, Animated, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, Animated } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { Colors } from '../../constants/colors';
+import { useModal } from '../../context/ModalContext';
 
 interface PingButtonProps {
   onPingSent: () => void;
@@ -12,8 +13,8 @@ interface PingButtonProps {
 const PingButton: React.FC<PingButtonProps> = ({
   onPingSent,
   disabled = false,
-  pingsRemaining = 0,
 }) => {
+  const { showModal } = useModal();
   const scaleValue = useRef(new Animated.Value(1)).current;
   const progressValue = useRef(new Animated.Value(0)).current;
   const [isPressing, setIsPressing] = useState(false);
@@ -22,7 +23,11 @@ const PingButton: React.FC<PingButtonProps> = ({
 
   const handlePressIn = () => {
     if (disabled) {
-      Alert.alert('No pings left', 'You have used all your daily pings. Come back tomorrow!');
+      showModal({
+        title: 'No pings left',
+        message: 'You have used all your daily pings. Come back tomorrow!',
+        type: 'warning',
+      });
       return;
     }
 
@@ -117,7 +122,7 @@ const PingButton: React.FC<PingButtonProps> = ({
           <Image source={require('../../assets/img/PingBtn.png')} style={styles.buttonImage} />
           
           {/* Progress bar */}
-          {/* {isPressing && (
+          {isPressing && (
             <View style={styles.progressContainer}>
               <Animated.View
                 style={[
@@ -128,16 +133,16 @@ const PingButton: React.FC<PingButtonProps> = ({
                 ]}
               />
             </View>
-          )} */}
+          )}
         </View>
       </Animated.View>
       
       {/* Progress text */}
-      {isPressing && (
+      {/* {isPressing && (
         <Text style={styles.progressText}>
           {Math.round(progress * 100)}%
         </Text>
-      )}
+      )} */}
     </View>
   );
 };

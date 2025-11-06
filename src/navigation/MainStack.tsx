@@ -5,9 +5,23 @@ import ReceiveHelloScreen from '../screens/main/ReceiveHelloScreen';
 import SettingsScreen from '../screens/main/SettingsScreen';
 import StatsScreen from '../screens/main/StatsScreen';
 
+interface Ping {
+  id?: string;
+  sender_id: string;
+  sender_nickname: string;
+  sender_avatar: {
+    url: string;
+    rarity: 'common' | 'rare' | 'legendary';
+  };
+  sender_contacts?: Array<{
+    title: string;
+    url: string;
+  }>;
+}
+
 export type MainStackParamList = {
   SendHello: undefined;
-  ReceiveHello: undefined;
+  ReceiveHello: { ping: Ping };
   StatsScreen: undefined;
   SettingsScreen: undefined;
 };

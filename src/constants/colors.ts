@@ -1,7 +1,7 @@
 export const Colors = {
-  background: '#1c1f29',
+  background: '#14151c',
   backgroundDark: '#14151c',
-  backgroundSettings: '#272B38',
+  backgroundSettings: '#14151c',
   
   cardBackground: '#383D4F',
   cardBorder: '#20232e',
