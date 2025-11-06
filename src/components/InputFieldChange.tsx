@@ -1,6 +1,7 @@
 import React from "react";
 import { TextInput, StyleSheet, View, Text, TextInputProps } from "react-native";
 import { Colors } from "../constants/colors";
+import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage } from "../utils/scaling";
 
 interface InputFieldProps extends TextInputProps {
   label?: string;
@@ -31,23 +32,31 @@ export default InputFieldChange;
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    marginVertical: 10,
+    marginVertical: scaleMargin(10),
     alignSelf: "center",
   },
   label: {
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: "600",
-    marginBottom: 12,
+    marginBottom: scaleMargin(12),
   },
   input: {
-    width: '85%', 
+    width: getWidthPercentage(85), 
     color: Colors.textPrimary,
     fontFamily: 'DynaPuff',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: 'bold',
-    backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 22, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row', marginBottom: 12
+    backgroundColor: Colors.cardBackground, 
+    borderRadius: scaleBorderRadius(22), 
+    padding: scalePadding(22), 
+    alignItems: 'center', 
+    borderWidth: 1, 
+    borderColor: Colors.cardBorder, 
+    justifyContent: 'space-between', 
+    flexDirection: 'row', 
+    marginBottom: scaleMargin(12)
   },
 });
 

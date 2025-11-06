@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import { Colors } from '../constants/colors';
+import { moderateScale, scaleMargin } from '../utils/scaling';
 
 export default function LoadingScreen() {
   return (
@@ -32,17 +33,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 42,
+    fontSize: moderateScale(42),
     fontWeight: 'bold',
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
-    marginBottom: 40,
+    marginBottom: scaleMargin(40),
   },
   spinner: {
-    marginBottom: 20,
+    marginBottom: scaleMargin(20),
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: moderateScale(18),
     fontFamily: 'DynaPuff',
     color: Colors.textAccent,
     fontWeight: '600',

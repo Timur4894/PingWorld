@@ -10,6 +10,7 @@ import {
 import { LinearGradient } from 'react-native-linear-gradient';
 import { Colors } from '../constants/colors';
 import GradientButton from './GradientButton';
+import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage, scaleSize } from '../utils/scaling';
 
 export type ModalType = 'error' | 'success' | 'info' | 'warning';
 
@@ -104,46 +105,46 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: scalePadding(20),
   },
   modalContainer: {
-    width: width * 0.85,
+    width: getWidthPercentage(85),
     backgroundColor: Colors.cardBackground,
-    borderRadius: 25,
+    borderRadius: scaleBorderRadius(25),
     borderWidth: 1,
     borderColor: Colors.cardBorder,
     overflow: 'hidden',
   },
   content: {
-    padding: 24,
+    padding: scalePadding(24),
     alignItems: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: moderateScale(24),
     fontWeight: 'bold',
     fontFamily: 'DynaPuff',
-    marginBottom: 12,
+    marginBottom: scaleMargin(12),
     textAlign: 'center',
   },
   message: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontFamily: 'DynaPuff',
     color: Colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: scaleSize(22),
   },
   buttonContainer: {
     flexDirection: 'row',
-    padding: 16,
-    gap: 12,
+    padding: scalePadding(16),
+    gap: scaleMargin(12),
     justifyContent: 'center',
     alignItems: 'center',
   },
   cancelButton: {
     flex: 1,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 25,
+    paddingVertical: scalePadding(16),
+    paddingHorizontal: scalePadding(24),
+    borderRadius: scaleBorderRadius(25),
     backgroundColor: Colors.backgroundSettings,
     borderWidth: 1,
     borderColor: Colors.cardBorder,
@@ -151,14 +152,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButtonText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
     fontWeight: '600',
   },
   confirmButtonContainer: {
     flex: 1,
-    borderRadius: 25,
+    borderRadius: scaleBorderRadius(25),
     overflow: 'hidden',
     // borderWidth: 1,
     // borderColor: Colors.borderButton,
@@ -167,8 +168,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   confirmButtonGradient: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
+    paddingVertical: scalePadding(16),
+    paddingHorizontal: scalePadding(24),
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -176,7 +177,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   confirmButtonText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
     fontWeight: '600',

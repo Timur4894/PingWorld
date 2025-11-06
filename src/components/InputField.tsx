@@ -1,6 +1,7 @@
 import React from "react";
 import { TextInput, StyleSheet, View, Text, TextInputProps } from "react-native";
 import { Colors } from "../constants/colors";
+import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius } from "../utils/scaling";
 
 interface InputFieldProps extends TextInputProps {
   label?: string;
@@ -32,24 +33,24 @@ export default InputField;
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    marginVertical: 10,
+    marginVertical: scaleMargin(10),
     alignSelf: "center",
   },
   label: {
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: "600",
-    marginBottom: 12,
+    marginBottom: scaleMargin(12),
   },
   input: {
     borderWidth: 2,
     borderColor: Colors.borderInput,
-    borderRadius: 20,
+    borderRadius: scaleBorderRadius(20),
     fontFamily: 'DynaPuff',
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-    fontSize: 16,
+    paddingVertical: scalePadding(20),
+    paddingHorizontal: scalePadding(16),
+    fontSize: moderateScale(16),
     color: Colors.textPrimary,
     backgroundColor: "transparent", // прозрачный фон
   },

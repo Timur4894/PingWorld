@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform, Dimensions, Clipboard, Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../navigation/MainStack';
@@ -16,12 +16,11 @@ import { useModal } from '../../context/ModalContext';
 import { SettingsSkeleton } from '../../components/Skeleton/SkeletonScreen';
 import { getCountryFlag, getCountryName, getCountry } from '../../utils/countryUtils';
 import CountryPickerModal, { Country } from '../../components/CountryPickerModal';
+import { moderateScale, scaleSize, scaleHeight, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage, getHeightPercentage } from '../../utils/scaling';
 
 export default function SettingsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList, 'SettingsScreen'>>();
   const { showModal } = useModal();
-  const [userData, setUserData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedUrl, setEditedUrl] = useState('');
@@ -226,150 +225,187 @@ export default function SettingsScreen() {
       },
     });
   };
+
+  const handleCopyContact = async () => {
+    const contactUrl = user?.contacts && user.contacts.length > 0 ? user.contacts[0].url : '';
+    if (contactUrl) {
+      try {
+        await Clipboard.setString(contactUrl);
+        showModal({
+          title: 'Copied!',
+          message: 'Contact link copied to clipboard',
+          type: 'success',
+        });
+      } catch (error) {
+        showModal({
+          title: 'Error',
+          message: 'Failed to copy link',
+          type: 'error',
+        });
+      }
+    }
+  };
+
+  const truncateText = (text: string, maxLength: number = 30): string => {
+    if (!text) return 'No contact link';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
   
   if (loading) {
     return <SettingsSkeleton />;
   }
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+    >
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: getWidthPercentage(95), marginTop: scaleMargin(20)}}>
+          <TouchableOpacity onPress={()=>{navigation.goBack()}}>
+            <BackSvg />
+          </TouchableOpacity>
+         
+        </View>
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '95%', marginTop: 20}}>
-        <TouchableOpacity onPress={()=>{navigation.goBack()}}>
-          <BackSvg />
-        </TouchableOpacity>
-       
-      </View>
-
-      <View style={{alignItems: 'center', marginBottom: 10}}>
-        <Text style={{fontSize: 42, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>
-          My avatar
-        </Text>
-        <TouchableOpacity 
-          style={{flexDirection: 'row', alignItems: 'center', marginTop: 8}} 
-          onPress={()=>{setIsCountryPickerVisible(true)}}
-        >
-          {user?.country ? (
-            <>
-              {getCountryFlag(user.country) && (
-                <Text style={{fontSize: 20, marginRight: 8}}>{getCountryFlag(user.country)}</Text>
-              )}
-              {getCountryName(user.country) && (
-                <Text style={{fontSize: 20, fontFamily: 'DynaPuff', color: Colors.textSecondary}}>
-                  {getCountryName(user.country)}
+        <View style={{alignItems: 'center', marginBottom: scaleMargin(10)}}>
+          <Text style={{fontSize: moderateScale(32), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>
+            My avatar
+          </Text>
+          <TouchableOpacity 
+            style={{flexDirection: 'row', alignItems: 'center', marginTop: scaleMargin(8)}} 
+            onPress={()=>{setIsCountryPickerVisible(true)}}
+          >
+            {user?.country ? (
+              <>
+                {getCountryFlag(user.country) && (
+                  <Text style={{fontSize: moderateScale(18), marginRight: scaleMargin(8)}}>{getCountryFlag(user.country)}</Text>
+                )}
+                {getCountryName(user.country) && (
+                  <Text style={{fontSize: moderateScale(18), fontFamily: 'DynaPuff', color: Colors.textSecondary}}>
+                    {getCountryName(user.country)}
+                  </Text>
+                )}
+                <EditSvg color={Colors.textPrimary} style={{marginLeft: scaleMargin(8)}}/>
+              </>
+            ) : (
+              <>
+                <Text style={{fontSize: moderateScale(20), fontFamily: 'DynaPuff', color: Colors.textSecondary}}>
+                  Select country
                 </Text>
-              )}
-              <EditSvg color={Colors.textPrimary} style={{marginLeft: 8}}/>
+                <EditSvg color={Colors.textPrimary} style={{marginLeft: scaleMargin(8)}}/>
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {selectedCountry && selectedCountry.code !== user?.country && (
+          <View style={{width: getWidthPercentage(85), marginBottom: scaleMargin(12)}}>
+            <GradientButton
+              title={isSavingCountry ? "Saving..." : "Save Country"}
+              onPress={handleSaveCountry}
+              disabled={isSavingCountry}
+            />
+          </View>
+        )}
+          
+
+        <View style={{backgroundColor: Colors.cardBackground, borderRadius: scaleBorderRadius(25), padding: scalePadding(16), width: getWidthPercentage(85), alignItems: 'center'}}>
+          <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
+
+          <View style={{flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start'}}>
+            <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>{user.avatar.rarity}</Text>
+            {user.avatar.rarity === 'legendary' && <Image source={require('../../assets/img/stars/Legendary.png')}/>}
+            {user.avatar.rarity === 'rare' && <Image source={require('../../assets/img/stars/Rare.png')}/>}
+            {user.avatar.rarity === 'common' && <Image source={require('../../assets/img/stars/Common.png')}/>}
+          </View>
+
+          
+          <Image source={{uri: user.avatar.url}} style={{width: getWidthPercentage(85), height: getHeightPercentage(30), maxHeight: scaleHeight(300)}} resizeMode='contain'/>
+        </View>
+
+        <View style={{width: '100%', alignItems: 'center'}}>
+          <View style={{width: getWidthPercentage(85), backgroundColor: Colors.cardBackground, borderRadius: scaleBorderRadius(22), padding: scalePadding(16), alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row', marginBottom: scaleMargin(12)}}>
+            <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>Your streak</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={{fontSize: moderateScale(20), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginRight: scaleMargin(8)}}>{user.current_streak}</Text>
+              <FireSvg style={{marginTop: scaleMargin(-10)}}/>
+            </View>
+          </View>
+          {isEditing ? (
+            <>
+              <InputFieldChange
+                label="Contact link"
+                placeholder="Enter your contact link"
+                value={editedUrl}
+                onChangeText={setEditedUrl}
+              />
+              <View style={{flexDirection: 'column', width: getWidthPercentage(85), gap: scaleMargin(12), marginTop: scaleMargin(12), justifyContent: 'center', alignItems: 'center'}}>
+                
+                <View style={{width: getWidthPercentage(90)}}>
+                  <GradientButton
+                    title={isSaving ? "Saving..." : "Save"}
+                    onPress={handleSaveContact}
+                    disabled={isSaving}
+                  />
+                </View>
+                <TouchableOpacity
+                  onPress={handleCancelEdit}
+                  style={styles.cancelButton}
+                  disabled={isSaving}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
             </>
           ) : (
             <>
-              <Text style={{fontSize: 20, fontFamily: 'DynaPuff', color: Colors.textSecondary}}>
-                Select country
-              </Text>
-              <EditSvg color={Colors.textPrimary} style={{marginLeft: 8}}/>
-            </>
-          )}
-        </TouchableOpacity>
-      </View>
-
-      {selectedCountry && selectedCountry.code !== user?.country && (
-        <View style={{width: '85%', marginBottom: 12}}>
-          <GradientButton
-            title={isSavingCountry ? "Saving..." : "Save Country"}
-            onPress={handleSaveCountry}
-            disabled={isSavingCountry}
-          />
-        </View>
-      )}
-        
-
-
-
-      <View style={{backgroundColor: Colors.cardBackground, borderRadius: 25, padding: 16, width: '85%', alignItems: 'center'}}>
-        <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
-
-        <View style={{flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start'}}>
-          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>{user.avatar.rarity}</Text>
-          {user.avatar.rarity === 'legendary' && <Image source={require('../../assets/img/stars/Legendary.png')}/>}
-          {user.avatar.rarity === 'rare' && <Image source={require('../../assets/img/stars/Rare.png')}/>}
-          {user.avatar.rarity === 'common' && <Image source={require('../../assets/img/stars/Common.png')}/>}
-        </View>
-
-        
-        <Image source={{uri: user.avatar.url}} style={{width: '100%', height: 300}} resizeMode='contain'/>
-      </View>
-
-      <View style={{width: '100%', alignItems: 'center'}}>
-        <View style={{width: '85%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row', marginBottom: 12}}>
-          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>Your streak</Text>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={{fontSize: 20, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginRight: 8, }}>{user.current_streak}</Text>
-            <FireSvg />
-          </View>
-        </View>
-        {isEditing ? (
-          <>
-            <InputFieldChange
-              label="Contact link"
-              placeholder="Enter your contact link"
-              value={editedUrl}
-              onChangeText={setEditedUrl}
-            />
-            <View style={{flexDirection: 'column', width: '85%', gap: 12, marginTop: 12, justifyContent: 'center', alignItems: 'center'}}>
-              
-              <View style={{width: '90%'}}>
-                <GradientButton
-                  title={isSaving ? "Saving..." : "Save"}
-                  onPress={handleSaveContact}
-                  disabled={isSaving}
-                />
-              </View>
-              <TouchableOpacity
-                onPress={handleCancelEdit}
-                style={styles.cancelButton}
-                disabled={isSaving}
+            <View style={{width: getWidthPercentage(85), backgroundColor: Colors.cardBackground, borderRadius: scaleBorderRadius(22), padding: scalePadding(16), alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row', marginBottom: scaleMargin(12)}}>
+              <TouchableOpacity 
+                style={{flex: 1, marginRight: scaleMargin(8)}}
+                onPress={()=>{Linking.openURL(user?.contacts && user.contacts.length > 0 ? user.contacts[0].url : '')}}
+                activeOpacity={0.7}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text numberOfLines={1} ellipsizeMode="tail" style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textDecorationLine: 'underline'}}>
+                  {truncateText(user?.contacts && user.contacts.length > 0 ? user.contacts[0].url : 'No contact link', 30)}
+                </Text>
               </TouchableOpacity>
-            </View>
-          </>
-        ) : (
-          <>
-          <View style={{width: '85%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row', marginBottom: 12}}>
-            <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textDecorationLine: 'underline'}}>{user?.contacts && user.contacts.length > 0 ? user.contacts[0].url : ''}</Text>
-            <TouchableOpacity 
-              style={{flexDirection: 'row', alignItems: 'center'}}
-              onPress={handleEditContact}
+              <TouchableOpacity 
+                style={{flexDirection: 'row', alignItems: 'center'}}
+                onPress={handleEditContact}
+              >
+                  <EditSvg style={{marginLeft: scaleMargin(8)}}/>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity 
+              onPress={handleLogout}
             >
-              <EditSvg style={{marginLeft: 8}}/>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity 
-          onPress={handleLogout}
-        >
-          <Text style={{alignSelf: "center", fontSize: 14, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError,  marginTop: 10}}>Logout</Text>
-        </TouchableOpacity>
-
-         
-        </>
-        )}
-
-        
-      </View>
-      
-      {!isEditing  && (
-          <TouchableOpacity 
-          onPress={handleDeleteAccount}
-          disabled={isDeleting}
-          >
-            {isDeleting ? (
-              <ActivityIndicator size="small" color={Colors.textError} />
-            ) : (
-              <Text style={{alignSelf: "center", fontSize: 14, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError,  marginTop: 10}}>Delete account</Text>
-            )}
+            <Text style={{alignSelf: "center", fontSize: moderateScale(14), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError,  marginTop: scaleMargin(10)}}>Logout</Text>
           </TouchableOpacity>
-        )
-        }
+          </>
+          )}
+        </View>
+        
+        {!isEditing  && (
+            <TouchableOpacity 
+            onPress={handleDeleteAccount}
+            disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <ActivityIndicator size="small" color={Colors.textError} />
+              ) : (
+                <Text style={{alignSelf: "center", fontSize: moderateScale(14), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError,  marginTop: scaleMargin(10)}}>Delete account</Text>
+              )}
+            </TouchableOpacity>
+          )
+          }
+      </ScrollView>
       
       <CountryPickerModal
         visible={isCountryPickerVisible}
@@ -377,18 +413,20 @@ export default function SettingsScreen() {
         onSelect={setSelectedCountry}
         onClose={() => setIsCountryPickerVisible(false)}
       />
-
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    justifyContent: 'space-around',
-    padding: 16, 
-    alignItems: 'center',
     backgroundColor: Colors.backgroundSettings,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'space-around',
+    padding: scalePadding(16), 
+    alignItems: 'center',
   },
   backgroundImage: {
     position: 'absolute',
@@ -400,11 +438,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: 60,
-    marginBottom: 40,
+    marginTop: scaleMargin(60),
+    marginBottom: scaleMargin(40),
   },
   title: { 
-    fontSize: 38, 
+    fontSize: moderateScale(38), 
     fontWeight: '800', 
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
@@ -413,13 +451,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: scalePadding(20),
   },
   signUpText: {
     color: Colors.textPrimary,
     textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
+    marginTop: scaleMargin(20),
+    fontSize: moderateScale(16),
     fontFamily: 'DynaPuff',
   },
   signUpLink: {
@@ -427,63 +465,63 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   cancelButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 25,
+    paddingVertical: scalePadding(16),
+    paddingHorizontal: scalePadding(24),
+    borderRadius: scaleBorderRadius(25),
     backgroundColor: Colors.cardBackground,
     borderWidth: 1,
     borderColor: Colors.cardBorder,
     justifyContent: 'center',
     alignItems: 'center',
-    minWidth: 100,
+    minWidth: scaleSize(100),
   },
   cancelButtonText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
     fontWeight: '600',
   },
   countrySelector: {
-    width: '85%',
-    marginVertical: 10,
+    width: getWidthPercentage(85),
+    marginVertical: scaleMargin(10),
   },
   countryLabel: {
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '600',
-    marginBottom: 12,
+    marginBottom: scaleMargin(12),
   },
   countrySelectorContent: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 2,
     borderColor: Colors.borderInput,
-    borderRadius: 20,
-    paddingVertical: 20,
-    paddingHorizontal: 16,
+    borderRadius: scaleBorderRadius(20),
+    paddingVertical: scalePadding(20),
+    paddingHorizontal: scalePadding(16),
     backgroundColor: 'transparent',
   },
   countryFlag: {
-    fontSize: 24,
-    marginRight: 12,
+    fontSize: moderateScale(24),
+    marginRight: scaleMargin(12),
   },
   countryName: {
     flex: 1,
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
   },
   countryPlaceholder: {
     flex: 1,
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontFamily: 'DynaPuff',
     color: 'rgba(255,255,255,0.6)',
   },
   arrow: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     color: Colors.textSecondary,
-    marginLeft: 8,
+    marginLeft: scaleMargin(8),
   },
 });
 

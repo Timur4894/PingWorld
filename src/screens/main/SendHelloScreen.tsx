@@ -16,6 +16,7 @@ import pingApi from '../../api/pingApi';
 import streakApi from '../../api/streakApi';
 import { useModal } from '../../context/ModalContext';
 import { SendHelloSkeleton } from '../../components/Skeleton/SkeletonScreen';
+import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage } from '../../utils/scaling';
 
 interface PingEntry {
   id?: string;
@@ -126,7 +127,7 @@ export default function SendHelloScreen() {
 
 
       <FadeInView delay={0} direction="down">
-        <View style={{justifyContent: 'space-between', width: '90%', alignItems: 'center', flexDirection: 'row', marginTop: 60}}>
+        <View style={{justifyContent: 'space-between', width: getWidthPercentage(90), alignItems: 'center', flexDirection: 'row', marginTop: scaleMargin(60)}}>
           <AnimatedButton onPress={()=>{navigation.navigate('StatsScreen')}}>
             <WorldSvg fill={Colors.textPrimary} width={30} height={30}/>
           </AnimatedButton>
@@ -134,11 +135,11 @@ export default function SendHelloScreen() {
           <FadeInView delay={200} direction="up">
             <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
               <PulseView scale={1.1} duration={2000}>
-                <Text style={{fontSize: 24, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>
+                <Text style={{fontSize: moderateScale(24), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>
                   {currentStreak}
                 </Text>
               </PulseView>
-              <FireSvg style={{marginBottom: 10, marginLeft: 8}}/>
+              <FireSvg style={{marginBottom: scaleMargin(10), marginLeft: scaleMargin(8)}}/>
             </View>
           </FadeInView>
 
@@ -151,9 +152,9 @@ export default function SendHelloScreen() {
 
 
       <FadeInView delay={400} direction="up">
-        <View style={{alignItems: 'center', gap: 30}}>
+        <View style={{alignItems: 'center', gap: scaleMargin(30)}}>
           <FadeInView delay={600} direction="up">
-              <Text style={{fontSize: 18, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>
+              <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>
              You can send up to 5 pings per day
               
             </Text>
@@ -175,30 +176,30 @@ export default function SendHelloScreen() {
         {receivedPings && receivedPings.length > 0 ? (
           <View>
             <FadeInView delay={1200} direction="up">
-              <Text style={{fontSize: 22,textAlign: 'center', fontWeight: 'bold', marginBottom: 20,fontFamily: 'DynaPuff', color: Colors.textPrimary}}>People who pinged you</Text>
+              <Text style={{fontSize: moderateScale(16),textAlign: 'center', fontWeight: 'bold', marginBottom: scaleMargin(20),fontFamily: 'DynaPuff', color: Colors.textPrimary}}>People who pinged you</Text>
             </FadeInView>
 
             {displayPings.map((ping, index) => (
               <AnimatedCard key={ping.id || index} delay={1400 + (index * 200)} pressable={true} onPress={()=>{navigation.navigate('ReceiveHello', {ping})}}>
-                <View style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row', marginBottom: 10}}>
-                  <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>{ping.sender_nickname}</Text>
+                <View style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: scaleBorderRadius(22), padding: scalePadding(16), alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row', marginBottom: scaleMargin(10)}}>
+                  <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>{ping.sender_nickname}</Text>
                 
-                    <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, }}>view profile</Text>
+                    <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, }}>view profile</Text>
                 </View>
               </AnimatedCard>
             ))}
             
             {receivedPings.length > 2 && !showAll && (
               <FadeInView delay={1600 + (displayPings.length * 200)} direction="up">
-                <AnimatedButton onPress={handleShowMore} style={{alignSelf: 'center', marginTop: 10, marginBottom: 20}}>
-                  <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent}}>show more</Text>
+                <AnimatedButton onPress={handleShowMore} style={{alignSelf: 'center', marginTop: scaleMargin(10), marginBottom: scaleMargin(20)}}>
+                  <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent}}>show more</Text>
                 </AnimatedButton>
               </FadeInView>
             )}
           </View>
         ) : (
           <FadeInView delay={1200} direction="up">
-            <Text style={{fontSize: 14, fontFamily: 'DynaPuff', color: Colors.textSecondary, textAlign: 'center', marginBottom: 20}}>No one has pinged you yet, be the first to surprise someone!</Text>
+            <Text style={{fontSize: moderateScale(14), fontFamily: 'DynaPuff', color: Colors.textSecondary, textAlign: 'center', marginBottom: scaleMargin(20)}}>No one has pinged you yet, be the first to surprise someone!</Text>
           </FadeInView>
         )}
       </FadeInView>
@@ -212,7 +213,7 @@ const styles = StyleSheet.create({
   container: { 
     flex: 1, 
     justifyContent: 'space-between',
-    padding: 16, 
+    padding: scalePadding(16), 
     alignItems: 'center',
     backgroundColor: Colors.background,
   },
@@ -226,11 +227,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: 60,
-    marginBottom: 40,
+    marginTop: scaleMargin(60),
+    marginBottom: scaleMargin(40),
   },
   title: { 
-    fontSize: 38, 
+    fontSize: moderateScale(38), 
     fontWeight: '800', 
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
@@ -239,13 +240,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: scalePadding(20),
   },
   signUpText: {
     color: Colors.textPrimary,
     textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
+    marginTop: scaleMargin(20),
+    fontSize: moderateScale(16),
     fontFamily: 'DynaPuff',
   },
   signUpLink: {

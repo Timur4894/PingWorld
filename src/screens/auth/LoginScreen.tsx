@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/AuthStack';
@@ -8,6 +8,7 @@ import InputField from '../../components/InputField';
 import { Colors } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
 import { useModal } from '../../context/ModalContext';
+import { moderateScale, scalePadding, scaleMargin } from '../../utils/scaling';
 
 
 export default function LoginScreen() {
@@ -80,58 +81,69 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+    >
       <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={{width: '100%'}}>
+         
+          <View style={styles.header}>
+            <Text style={styles.title}>Log in</Text>
+            <Image source={require('../../assets/img/Roket.png')}/>
+          </View>
+          
+          <View style={styles.formContainer}>
+            <InputField
+              label="Nickname"
+              placeholder="Enter your nickname"
+              value={nickname}
+              onChangeText={setNickname}
+            />
+            
+            <InputField
+              label="Password"
+              placeholder="Enter your password"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+            <TouchableOpacity onPress={() => navigation.replace('SignUpScreen')}>
+              <Text style={styles.signUpText}>
+                Don't have an account yet? <Text style={styles.signUpLink}>Sign up</Text>
+              </Text>
+            </TouchableOpacity>
+           
+          </View>
+        </View>      
 
-    <View style={{width: '100%'}}>
-     
-      <View style={styles.header}>
-        <Text style={styles.title}>Log in</Text>
-        <Image source={require('../../assets/img/Roket.png')}/>
-      </View>
-      
-      <View style={styles.formContainer}>
-        <InputField
-          label="Nickname"
-          placeholder="Enter your nickname"
-          value={nickname}
-          onChangeText={setNickname}
+        <GradientButton
+          title={isLoading ? "Login..." : "Log in"}
+          onPress={onLogin}
+          disabled={isLoading}
         />
-        
-        <InputField
-          label="Password"
-          placeholder="Enter your password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TouchableOpacity onPress={() => navigation.replace('SignUpScreen')}>
-          <Text style={styles.signUpText}>
-            Don't have an account yet? <Text style={styles.signUpLink}>Sign up</Text>
-          </Text>
-        </TouchableOpacity>
-       
-      </View>
-    </View>      
-
-      <GradientButton
-        title={isLoading ? "Login..." : "Log in"}
-        onPress={onLogin}
-        disabled={isLoading}
-      />
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    justifyContent: 'space-between',
-    flexDirection: 'column',
-    padding: 16, 
-    paddingVertical: 60,
-    alignItems: 'center',
     backgroundColor: Colors.backgroundDark,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'space-between',
+    padding: scalePadding(16), 
+    paddingVertical: scalePadding(60),
+    alignItems: 'center',
   },
   backgroundImage: {
     position: 'absolute',
@@ -144,11 +156,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: 60,
-    marginBottom: 40,
+    marginTop: scaleMargin(60),
+    marginBottom: scaleMargin(40),
   },
   title: { 
-    fontSize: 38, 
+    fontSize: moderateScale(38), 
     fontWeight: '800', 
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
@@ -157,13 +169,13 @@ const styles = StyleSheet.create({
     // flex: 1,
     justifyContent: 'center',
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: scalePadding(20),
   },
   signUpText: {
     color: Colors.textPrimary,
     textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
+    marginTop: scaleMargin(20),
+    fontSize: moderateScale(16),
     fontFamily: 'DynaPuff',
   },
   signUpLink: {

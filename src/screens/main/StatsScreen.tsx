@@ -16,6 +16,7 @@ import leaderboardApi from '../../api/leaderboardApi';
 import { useModal } from '../../context/ModalContext';
 import { StatsSkeleton } from '../../components/Skeleton/SkeletonScreen';
 import { getCountryFlag } from '../../utils/countryUtils';
+import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage, scaleSize } from '../../utils/scaling';
 
 interface Avatar {
   url: string;
@@ -85,8 +86,8 @@ export default function StatsScreen() {
     <ScrollView style={styles.container}>
       <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
 
-      <FadeInView delay={0} direction="down" style={{alignSelf: 'flex-start', width: '95%',marginLeft: 16 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center',marginBottom: 20}}>
+      <FadeInView delay={0} direction="down" style={{alignSelf: 'flex-start', width: getWidthPercentage(95),marginLeft: scaleMargin(16) }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center',marginBottom: scaleMargin(20)}}>
           <AnimatedButton onPress={()=>{navigation.goBack()}}>
             <BackSvg />
           </AnimatedButton>
@@ -94,28 +95,28 @@ export default function StatsScreen() {
       </FadeInView>
 
       <FadeInView delay={200} direction="up">
-          <Text style={{fontSize:32, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginBottom: 50, textAlign: 'center'}}>
+          <Text style={{fontSize: moderateScale(22), width: '80%', alignSelf: 'center', fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginBottom: scaleMargin(50), textAlign: 'center'}}>
           Already <PulseView scale={1.05} duration={2500}>
-            <Text style={{fontSize:32, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, marginBottom: -10}}>
+            <Text style={{fontSize: moderateScale(32), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, marginBottom: -10}}>
               {totalUsers}
             </Text>
           </PulseView> people have pinged at least once!
         </Text>
       </FadeInView>
 
-      <FadeInView delay={400} direction="up" style={{marginLeft: 16}}>
-        <Text style={{fontSize:22, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginBottom: 20}}>Top pingers</Text>
+      <FadeInView delay={400} direction="up" style={{marginLeft: scaleMargin(16)}}>
+        <Text style={{fontSize: moderateScale(18), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginBottom: scaleMargin(20)}}>Top pingers</Text>
       </FadeInView>
       
-      <View style={{gap: 12, width: '100%', paddingHorizontal: 16, marginBottom: 50}}>
+      <View style={{gap: scaleMargin(12), width: '100%', paddingHorizontal: scalePadding(16), marginBottom: scaleMargin(50)}}>
         {leaderboard.length > 0 ? (
           leaderboard.map((entry, index) => (    
             <AnimatedCard key={`${entry.nickname}-${index}`} delay={600 + (index * 200)} pressable={true}>
               {/* <TouchableOpacity onPress={()=>{navigation.navigate('ReceiveHello', {ping: entry, showPingButton: false})}} style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row'}}> */}
-              <View style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row'}}>
+              <View style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: scaleBorderRadius(22), padding: scalePadding(16), alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row'}}>
 
                 <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
-                  <Text style={{fontSize: 18, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, marginRight: 12, minWidth: 30}}>
+                  <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, marginRight: scaleMargin(12), minWidth: scaleSize(30)}}>
                     #{index + 1}
                   </Text>
                   {entry.avatar.rarity === 'legendary' && (
@@ -128,26 +129,26 @@ export default function StatsScreen() {
                     <Image source={require('../../assets/img/stars/Common.png')}/>
                       )}
      
-                  <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, flex: 1}}>
+                  <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, flex: 1}}>
                     {entry.nickname}
                   </Text>
                   {entry.country && getCountryFlag(entry.country) && (
-                    <Text style={{fontSize: 18, marginLeft: 8}}>{getCountryFlag(entry.country)}</Text>
+                    <Text style={{fontSize: moderateScale(18), marginLeft: scaleMargin(8)}}>{getCountryFlag(entry.country)}</Text>
                   )}
                 </View>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>
+                  <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>
                     {entry.current_streak}
                   </Text>
-                  <FireSvg style={{marginLeft: 8, marginTop: -10}}/>
+                  <FireSvg style={{marginLeft: scaleMargin(8), marginTop: scaleMargin(-10)}}/>
                 </View>
               </View>
             </AnimatedCard>
           ))
         ) : (
           <FadeInView delay={600} direction="up">
-            <View style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'center'}}>
-              <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>
+            <View style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: scaleBorderRadius(22), padding: scalePadding(16), alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'center'}}>
+              <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>
                 No leaderboard data available
               </Text>
             </View>
@@ -177,11 +178,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: 60,
-    marginBottom: 40,
+    marginTop: scaleMargin(60),
+    marginBottom: scaleMargin(40),
   },
   title: { 
-    fontSize: 38, 
+    fontSize: moderateScale(38), 
     fontWeight: '800', 
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
@@ -190,13 +191,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: scalePadding(20),
   },
   signUpText: {
     color: Colors.textPrimary,
     textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
+    marginTop: scaleMargin(20),
+    fontSize: moderateScale(16),
     fontFamily: 'DynaPuff',
   },
   signUpLink: {

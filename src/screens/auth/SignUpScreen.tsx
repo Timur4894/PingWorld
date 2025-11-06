@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/AuthStack';
@@ -9,6 +9,7 @@ import { Colors } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
 import { useModal } from '../../context/ModalContext';
 import CountryPickerModal, { Country } from '../../components/CountryPickerModal';
+import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage } from '../../utils/scaling';
 
 
 export default function SignUpScreen() {
@@ -95,71 +96,80 @@ export default function SignUpScreen() {
 
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+    >
       <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={{width: '100%'}}>
 
-      <View style={{width: '100%'}}>
-
-      
-      <View style={styles.header}>
-        <Text style={styles.title}>Your account</Text>
-      </View>
-      
-      <View style={styles.formContainer}>
-        <InputField
-          label="Nickname"
-          placeholder="Paste your socials link here"
-          value={nickname}
-          onChangeText={setNickname}
-        />
-
-        <InputField
-          label="Contact link"
-          placeholder="Enter your contact link"
-          value={contact}
-          onChangeText={setContact}
-        />
         
-        <InputField
-          label="Password"
-          placeholder="Enter your password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+        <View style={styles.header}>
+          <Text style={styles.title}>Your account</Text>
+        </View>
         
-        <TouchableOpacity
-          style={styles.countrySelector}
-          onPress={() => setIsCountryPickerVisible(true)}
-        >
-          <Text style={styles.countryLabel}>Country</Text>
-          <View style={styles.countrySelectorContent}>
-            {selectedCountry ? (
-              <>
-                <Text style={styles.countryFlag}>{selectedCountry.flag}</Text>
-                <Text style={styles.countryName}>{selectedCountry.name}</Text>
-              </>
-            ) : (
-              <Text style={styles.countryPlaceholder}>Select your country</Text>
-            )}
-            <Text style={styles.arrow}>▼</Text>
-          </View>
-        </TouchableOpacity>
-    
-        <TouchableOpacity onPress={()=>{navigation.replace('Login')}}>
-            <Text style={styles.signUpText}>
-            Already have an account? <Text style={styles.signUpLink}>Log in</Text>
-            </Text>
-        </TouchableOpacity>
-       
-      </View>
-      </View>
+        <View style={styles.formContainer}>
+          <InputField
+            label="Nickname"
+            placeholder="Paste your socials link here"
+            value={nickname}
+            onChangeText={setNickname}
+          />
 
-      <GradientButton
-        title={isLoading ? "Creating..." : "Save"}
-        onPress={onSignUp}
-        disabled={isLoading}
-      />
+          <InputField
+            label="Contact link"
+            placeholder="Enter your contact link"
+            value={contact}
+            onChangeText={setContact}
+          />
+          
+          <InputField
+            label="Password"
+            placeholder="Enter your password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+          
+          <TouchableOpacity
+            style={styles.countrySelector}
+            onPress={() => setIsCountryPickerVisible(true)}
+          >
+            <Text style={styles.countryLabel}>Country</Text>
+            <View style={styles.countrySelectorContent}>
+              {selectedCountry ? (
+                <>
+                  <Text style={styles.countryFlag}>{selectedCountry.flag}</Text>
+                  <Text style={styles.countryName}>{selectedCountry.name}</Text>
+                </>
+              ) : (
+                <Text style={styles.countryPlaceholder}>Select your country</Text>
+              )}
+              <Text style={styles.arrow}>▼</Text>
+            </View>
+          </TouchableOpacity>
+      
+          <TouchableOpacity onPress={()=>{navigation.replace('Login')}}>
+              <Text style={styles.signUpText}>
+              Already have an account? <Text style={styles.signUpLink}>Log in</Text>
+              </Text>
+          </TouchableOpacity>
+         
+        </View>
+        </View>
+
+        <GradientButton
+          title={isLoading ? "Creating..." : "Save"}
+          onPress={onSignUp}
+          disabled={isLoading}
+        />
+      </ScrollView>
       
       <CountryPickerModal
         visible={isCountryPickerVisible}
@@ -167,18 +177,21 @@ export default function SignUpScreen() {
         onSelect={setSelectedCountry}
         onClose={() => setIsCountryPickerVisible(false)}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    justifyContent: 'space-between',
-    padding: 16, 
-    paddingVertical: 60,
-    alignItems: 'center',
     backgroundColor: Colors.backgroundDark,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'space-between',
+    padding: scalePadding(16), 
+    paddingVertical: scalePadding(60),
+    alignItems: 'center',
   },
   backgroundImage: {
     position: 'absolute',
@@ -190,11 +203,11 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
     // justifyContent: 'space-between',
     width: '100%',
-    marginTop: 20,
-    marginBottom: 40,
+    marginTop: scaleMargin(20),
+    marginBottom: scaleMargin(40),
   },
   title: { 
-    fontSize: 38, 
+    fontSize: moderateScale(38), 
     fontWeight: '800', 
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
@@ -203,13 +216,13 @@ const styles = StyleSheet.create({
     // flex: 1,
     justifyContent: 'center',
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: scalePadding(20),
   },
   signUpText: {
     color: Colors.textPrimary,
     textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
+    marginTop: scaleMargin(20),
+    fontSize: moderateScale(16),
     fontFamily: 'DynaPuff',
   },
   signUpLink: {
@@ -218,45 +231,45 @@ const styles = StyleSheet.create({
   },
   countrySelector: {
     width: '100%',
-    marginVertical: 10,
+    marginVertical: scaleMargin(10),
   },
   countryLabel: {
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '600',
-    marginBottom: 12,
+    marginBottom: scaleMargin(12),
   },
   countrySelectorContent: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 2,
     borderColor: Colors.borderInput,
-    borderRadius: 20,
-    paddingVertical: 20,
-    paddingHorizontal: 16,
+    borderRadius: scaleBorderRadius(20),
+    paddingVertical: scalePadding(20),
+    paddingHorizontal: scalePadding(16),
     backgroundColor: 'transparent',
   },
   countryFlag: {
-    fontSize: 24,
-    marginRight: 12,
+    fontSize: moderateScale(24),
+    marginRight: scaleMargin(12),
   },
   countryName: {
     flex: 1,
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
   },
   countryPlaceholder: {
     flex: 1,
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontFamily: 'DynaPuff',
     color: 'rgba(255,255,255,0.6)',
   },
   arrow: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     color: Colors.textSecondary,
-    marginLeft: 8,
+    marginLeft: scaleMargin(8),
   },
 });
 

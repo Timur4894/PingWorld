@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Clipboard } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Clipboard, ScrollView, Linking } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../navigation/MainStack';
@@ -15,6 +15,7 @@ import pingApi from '../../api/pingApi';
 import { useModal } from '../../context/ModalContext';
 import { ReceiveHelloSkeleton } from '../../components/Skeleton/SkeletonScreen';
 import { getCountryFlag, getCountryName } from '../../utils/countryUtils';
+import { moderateScale, scaleSize, scaleHeight, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage, getHeightPercentage } from '../../utils/scaling';
 
 interface Ping {
   id?: string;
@@ -52,7 +53,7 @@ export default function ReceiveHelloScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList, 'ReceiveHello'>>();
   const route = useRoute<ReceiveHelloRouteProp>();
   const { showModal } = useModal();
-  const {ping, showPingButton = true} = route.params;
+  const {ping} = route.params;
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -157,28 +158,31 @@ export default function ReceiveHelloScreen() {
   }
   
   return (
-    <View style={styles.container}>
-
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '95%', marginTop: 20}}>
+    <ScrollView 
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: getWidthPercentage(95), marginTop: scaleMargin(20)}}>
         <TouchableOpacity onPress={()=>{navigation.goBack()}}>
           <BackSvg />
         </TouchableOpacity>
 
         <View style={{justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
-          <Text style={{fontSize: 22, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginRight: 8}}>{user?.current_streak || 0}</Text>
+          <Text style={{fontSize: moderateScale(22), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginRight: scaleMargin(8)}}>{user?.current_streak || 0}</Text>
           <FireSvg />
         </View>
       </View>
 
-      <View style={{alignItems: 'center', marginBottom: 10}}>
-        <Text style={{fontSize: 42, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>{ping.sender_nickname} {'\n'} <Text style={{fontSize: 42, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, textAlign: 'center'}}>Pinged You</Text></Text>
+      <View style={{alignItems: 'center', marginBottom: scaleMargin(10)}}>
+        <Text style={{fontSize: moderateScale(32), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>{ping.sender_nickname} {'\n'} <Text style={{fontSize: moderateScale(32), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, textAlign: 'center'}}>Pinged You</Text></Text>
         {user?.country && (
-          <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8}}>
+          <View style={{flexDirection: 'row', alignItems: 'center', marginTop: scaleMargin(8)}}>
             {getCountryFlag(user.country) && (
-              <Text style={{fontSize: 20, marginRight: 8}}>{getCountryFlag(user.country)}</Text>
+              <Text style={{fontSize: moderateScale(20), marginRight: scaleMargin(8)}}>{getCountryFlag(user.country)}</Text>
             )}
             {getCountryName(user.country) && (
-              <Text style={{fontSize: 16, fontFamily: 'DynaPuff', color: Colors.textSecondary}}>
+              <Text style={{fontSize: moderateScale(16), fontFamily: 'DynaPuff', color: Colors.textSecondary}}>
                 {getCountryName(user.country)}
               </Text>
             )}
@@ -186,32 +190,42 @@ export default function ReceiveHelloScreen() {
         )}
       </View>
 
-      <View style={{backgroundColor: Colors.cardBackground, borderRadius: 25, padding: 16, width: '85%', alignItems: 'center'}}>
+      <View style={{backgroundColor: Colors.cardBackground, borderRadius: scaleBorderRadius(25), padding: scalePadding(16), width: getWidthPercentage(85), alignItems: 'center'}}>
         <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
 
         <View style={{flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start'}}>
-          <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>{ping.sender_avatar.rarity}</Text>
+          <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>{ping.sender_avatar.rarity}</Text>
           {ping.sender_avatar.rarity === 'legendary' && <Image source={require('../../assets/img/stars/Legendary.png')}/>}
           {ping.sender_avatar.rarity === 'rare' && <Image source={require('../../assets/img/stars/Rare.png')}/>}
           {ping.sender_avatar.rarity === 'common' && <Image source={require('../../assets/img/stars/Common.png')}/>}
         </View>
 
         
-        <Image source={{uri: ping.sender_avatar.url}} style={{width: '100%', height: 300, borderRadius: 50}} resizeMode='contain'/>
+          <Image source={{uri: user.avatar.url}} style={{width: getWidthPercentage(85), height: getHeightPercentage(30), maxHeight: scaleHeight(300)}} resizeMode='contain'/>
       </View>
 
       <View style={{marginBottom: 0}}>
-        {ping.sender_contacts && ping.sender_contacts.length > 0 && (
-          <View style={{width: '85%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row'}}>
-            <Text style={{fontSize: 16, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textDecorationLine: 'underline'}}>{ping.sender_contacts[0].url}</Text>
+        
+        {user?.contacts && user.contacts.length > 0 && (
+
+          <View style={{width: getWidthPercentage(85), backgroundColor: Colors.cardBackground, borderRadius: scaleBorderRadius(22), padding: scalePadding(16), alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row'}}>
+            <TouchableOpacity 
+                style={{flex: 1, marginRight: scaleMargin(8)}}
+                onPress={()=>{Linking.openURL(user?.contacts && user.contacts.length > 0 ? user.contacts[0].url : '')}}
+                activeOpacity={0.7}
+              > 
+                <Text numberOfLines={1} ellipsizeMode="tail" style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textDecorationLine: 'underline'}}>
+                  {user.contacts[0].url}
+                </Text> 
+              </TouchableOpacity>
             <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}}>
-              <CopySvg style={{marginLeft: 8}}/>
+              <CopySvg style={{marginLeft: scaleMargin(8)}}/>
             </TouchableOpacity>
           </View>
         )}
 
         <TouchableOpacity onPress={()=>{handleReportUser()}}>
-          <Text style={{alignSelf: "center", fontSize: 14, fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError,  marginTop: 10}}>Report link or user</Text>
+          <Text style={{alignSelf: "center", fontSize: moderateScale(14), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError,  marginTop: scaleMargin(10)}}>Report link or user</Text>
         </TouchableOpacity>
 
       </View>
@@ -221,17 +235,20 @@ export default function ReceiveHelloScreen() {
         onPress={()=>{handlePong()}}
       />
 
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    justifyContent: 'space-around',
-    padding: 16, 
-    alignItems: 'center',
     backgroundColor: Colors.backgroundSettings,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'space-around',
+    padding: scalePadding(16), 
+    alignItems: 'center',
   },
   backgroundImage: {
     position: 'absolute',
@@ -243,11 +260,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: 60,
-    marginBottom: 40,
+    marginTop: scaleMargin(60),
+    marginBottom: scaleMargin(40),
   },
   title: { 
-    fontSize: 38, 
+    fontSize: moderateScale(38), 
     fontWeight: '800', 
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
@@ -256,13 +273,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: scalePadding(20),
   },
   signUpText: {
     color: Colors.textPrimary,
     textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
+    marginTop: scaleMargin(20),
+    fontSize: moderateScale(16),
     fontFamily: 'DynaPuff',
   },
   signUpLink: {

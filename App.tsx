@@ -12,7 +12,7 @@ function App() {
     <AuthProvider>
       <ModalProvider>
         <View style={styles.container}>
-          <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+          <StatusBar barStyle={'light-content'} />
           <AppNavigator />
         </View>
       </ModalProvider>

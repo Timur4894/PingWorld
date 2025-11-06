@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, Animated } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { Colors } from '../../constants/colors';
 import { useModal } from '../../context/ModalContext';
+import { moderateScale } from '../../utils/scaling';
 
 interface PingButtonProps {
   onPingSent: () => void;
@@ -183,7 +184,7 @@ const styles = StyleSheet.create({
   progressText: {
     position: 'absolute',
     bottom: -30,
-    fontSize: 14,
+    fontSize: moderateScale(14),
     fontFamily: 'DynaPuff',
     color: Colors.textAccent,
     fontWeight: 'bold',

@@ -2,6 +2,7 @@ import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
 import { LinearGradient } from "react-native-linear-gradient";
 import { Colors } from "../constants/colors";
+import { moderateScale, scalePadding, scaleBorderRadius, getWidthPercentage } from "../utils/scaling";
 
 interface GradientButtonProps {
   title: string;
@@ -33,23 +34,23 @@ export default GradientButton;
 
 const styles = StyleSheet.create({
   container: {
-    width: "80%", // можно подстраивать
-    borderRadius: 25,
+    width: getWidthPercentage(80),
+    borderRadius: scaleBorderRadius(20),
     overflow: "hidden",
     alignSelf: "center",
     borderWidth: 1,
     borderColor: Colors.borderButton,
   },
   gradient: {
-    borderRadius: 25,
+    borderRadius: scaleBorderRadius(20),
     justifyContent: "center",
     alignItems: "center",
   },
   text: {
     color: Colors.textPrimary,
     fontFamily: 'DynaPuff',
-    paddingVertical: 17,
-    fontSize: 18,
+    paddingVertical: scalePadding(17),
+    fontSize: moderateScale(18),
     fontWeight: "600",
   },
   disabled: {
