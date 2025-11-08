@@ -134,9 +134,7 @@ export default function StatsScreen() {
                   <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, marginRight: scaleMargin(12), minWidth: scaleSize(30)}}>
                     #{index + 1}
                   </Text>
-                  {entry.avatar.rarity === 'legendary' && (
-                    <Image source={require('../../assets/img/stars/Legendary.png')}/>
-                      )}
+  
                   {entry.avatar.rarity === 'rare' && <RareStar  />}
                   {entry.avatar.rarity === 'common' && <CommonStar/>}
                   {entry.avatar.rarity === 'mythic' && <MythicStar  />}
