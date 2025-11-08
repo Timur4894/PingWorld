@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
     const init = async () => {
       try {
         const token = await AsyncStorage.getItem(TOKEN_KEY);
-        console.log('AuthContext init - token from storage:', token ? '✅ ЕСТЬ' : '❌ ОТСУТСТВУЕТ');
+        console.log('AuthContext init - token from storage:', token ? '✅ EXISTS' : '❌ MISSING');
         
         if (token) {
           console.log('Token found in storage, checking validity...');
@@ -56,14 +56,12 @@ export const AuthProvider = ({ children }) => {
       const response = await authApi.login(nickname, password);
       console.log('✅ Login response received:', response.data);
       
-      // Токен автоматически сохраняется в axiosClient interceptor
-      // Проверяем, что токен был сохранен
       const tokenAfterLogin = await AsyncStorage.getItem(TOKEN_KEY);
-      console.log('🔑 Token после логина:', tokenAfterLogin ? '✅ ЕСТЬ' : '❌ ОТСУТСТВУЕТ');
+      console.log('🔑 Token after login:', tokenAfterLogin ? '✅ EXISTS' : '❌ MISSING');
       
       if (!tokenAfterLogin) {
-        console.error('❌ КРИТИЧЕСКАЯ ОШИБКА: Token не был сохранен после логина!');
-        throw new Error('Token не был сохранен после логина');
+        console.error('❌ CRITICAL ERROR: Token was not saved after login!');
+        throw new Error('Token was not saved after login');
       }
       
       const userData = response.data?.data?.user || response.data?.user || response.data?.data;
@@ -75,14 +73,13 @@ export const AuthProvider = ({ children }) => {
         console.log('⚠️ User data not in login response, fetching via getMe()...');
         try {
           const userResponse = await userManagementApi.getMe();
-          console.log('✅ getMe() после логина успешен:', userResponse.data);
+          console.log('✅ getMe() after login successful:', userResponse.data);
           setUser(userResponse.data?.data || userResponse.data);
         } catch (getMeError) {
-          console.error('❌ getMe() после логина провалился:', getMeError.response?.status);
-          console.error('   Это означает, что token не работает!');
-          // Проверяем token еще раз
+          console.error('❌ getMe() after login failed:', getMeError.response?.status);
+          console.error('   This means the token is not working!');
           const tokenCheck = await AsyncStorage.getItem(TOKEN_KEY);
-          console.error('   Token в AsyncStorage при ошибке:', tokenCheck ? '✅ ЕСТЬ' : '❌ ОТСУТСТВУЕТ');
+          console.error('   Token in AsyncStorage on error:', tokenCheck ? '✅ EXISTS' : '❌ MISSING');
           throw getMeError;
         }
       }
@@ -102,14 +99,12 @@ export const AuthProvider = ({ children }) => {
       const response = await authApi.signup(nickname, password, contacts, country);
       console.log('✅ Signup response received:', response.data);
       
-      // Токен автоматически сохраняется в axiosClient interceptor
-      // Проверяем, что токен был сохранен
       const tokenAfterSignup = await AsyncStorage.getItem(TOKEN_KEY);
-      console.log('🔑 Token после регистрации:', tokenAfterSignup ? '✅ ЕСТЬ' : '❌ ОТСУТСТВУЕТ');
+      console.log('🔑 Token after signup:', tokenAfterSignup ? '✅ EXISTS' : '❌ MISSING');
       
       if (!tokenAfterSignup) {
-        console.error('❌ КРИТИЧЕСКАЯ ОШИБКА: Token не был сохранен после регистрации!');
-        throw new Error('Token не был сохранен после регистрации');
+        console.error('❌ CRITICAL ERROR: Token was not saved after signup!');
+        throw new Error('Token was not saved after signup');
       }
       
       const userData = response.data?.data?.user || response.data?.user || response.data?.data;
@@ -121,14 +116,13 @@ export const AuthProvider = ({ children }) => {
         console.log('⚠️ User data not in signup response, fetching via getMe()...');
         try {
           const userResponse = await userManagementApi.getMe();
-          console.log('✅ getMe() после регистрации успешен:', userResponse.data);
+          console.log('✅ getMe() after signup successful:', userResponse.data);
           setUser(userResponse.data?.data || userResponse.data);
         } catch (getMeError) {
-          console.error('❌ getMe() после регистрации провалился:', getMeError.response?.status);
-          console.error('   Это означает, что token не работает!');
-          // Проверяем token еще раз
+          console.error('❌ getMe() after signup failed:', getMeError.response?.status);
+          console.error('   This means the token is not working!');
           const tokenCheck = await AsyncStorage.getItem(TOKEN_KEY);
-          console.error('   Token в AsyncStorage при ошибке:', tokenCheck ? '✅ ЕСТЬ' : '❌ ОТСУТСТВУЕТ');
+          console.error('   Token in AsyncStorage on error:', tokenCheck ? '✅ EXISTS' : '❌ MISSING');
           throw getMeError;
         }
       }

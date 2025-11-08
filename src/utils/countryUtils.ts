@@ -1,6 +1,5 @@
 import { Country } from '../components/CountryPickerModal';
 
-// Список стран из CountryPickerModal
 const COUNTRIES: Country[] = [
   { code: 'us', name: 'United States', flag: '🇺🇸' },
   { code: 'gb', name: 'United Kingdom', flag: '🇬🇧' },
@@ -115,11 +114,6 @@ const COUNTRIES: Country[] = [
   { code: 'af', name: 'Afghanistan', flag: '🇦🇫' },
 ];
 
-/**
- * Получает флаг страны по коду
- * @param countryCode - код страны (например, 'us', 'gb')
- * @returns флаг страны или null, если страна не найдена
- */
 export const getCountryFlag = (countryCode: string | null | undefined): string | null => {
   if (!countryCode) return null;
   
@@ -127,11 +121,6 @@ export const getCountryFlag = (countryCode: string | null | undefined): string |
   return country ? country.flag : null;
 };
 
-/**
- * Получает название страны по коду
- * @param countryCode - код страны (например, 'us', 'gb')
- * @returns название страны или null, если страна не найдена
- */
 export const getCountryName = (countryCode: string | null | undefined): string | null => {
   if (!countryCode) return null;
   
@@ -139,11 +128,6 @@ export const getCountryName = (countryCode: string | null | undefined): string |
   return country ? country.name : null;
 };
 
-/**
- * Получает полную информацию о стране по коду
- * @param countryCode - код страны (например, 'us', 'gb')
- * @returns объект Country или null, если страна не найдена
- */
 export const getCountry = (countryCode: string | null | undefined): Country | null => {
   if (!countryCode) return null;
   

@@ -145,11 +145,11 @@ export const StatsSkeleton = () => {
       </View>
 
       <View style={styles.statsGrid}>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((item) => (
+        {[1, 2, 3, 4, 5].map((item) => (
           <View key={item} style={styles.statCard}>
-            <SkeletonBox width={80} height={80} borderRadius={40} />
-            <SkeletonBox width={100} height={20} style={styles.marginTop} />
-            <SkeletonBox width={60} height={16} style={styles.marginTop} />
+            <SkeletonBox width={300} height={100} borderRadius={20} />
+            {/* <SkeletonBox width={100} height={20} style={styles.marginTop} /> */}
+            {/* <SkeletonBox width={60} height={16} style={styles.marginTop} /> */}
           </View>
         ))}
       </View>
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '95%',
-    marginTop: 20,
+    marginTop: 50,
     marginBottom: 20,
   },
   centerContent: {
@@ -220,10 +220,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    width: '100%',
+    flexDirection: 'column',
     paddingHorizontal: 16,
     marginTop: 20,
   },

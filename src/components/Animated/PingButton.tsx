@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, Animated } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { Colors } from '../../constants/colors';
 import { useModal } from '../../context/ModalContext';
-import { moderateScale } from '../../utils/scaling';
+import { getHeightPercentage, getWidthPercentage, moderateScale } from '../../utils/scaling';
 
 interface PingButtonProps {
   onPingSent: () => void;
@@ -34,7 +34,6 @@ const PingButton: React.FC<PingButtonProps> = ({
 
     setIsPressing(true);
     
-    // Start scaling animation
     Animated.spring(scaleValue, {
       toValue: 1.2,
       useNativeDriver: true,
@@ -42,10 +41,9 @@ const PingButton: React.FC<PingButtonProps> = ({
       friction: 8,
     }).start();
 
-    // Start progress animation
     Animated.timing(progressValue, {
       toValue: 1,
-      duration: 4000, // 4 seconds
+      duration: 4000,
       useNativeDriver: false,
     }).start(({ finished }) => {
       if (finished) {
@@ -54,10 +52,9 @@ const PingButton: React.FC<PingButtonProps> = ({
       }
     });
 
-    // Update progress every 100ms
     const progressInterval = setInterval(() => {
       setProgress(prev => {
-        const newProgress = prev + 0.025; // 100ms / 4000ms = 0.025
+        const newProgress = prev + 0.025;
         if (newProgress >= 1) {
           clearInterval(progressInterval);
           return 1;
@@ -75,7 +72,6 @@ const PingButton: React.FC<PingButtonProps> = ({
   };
 
   const resetButton = () => {
-    // Reset scale
     Animated.spring(scaleValue, {
       toValue: 1,
       useNativeDriver: true,
@@ -83,7 +79,6 @@ const PingButton: React.FC<PingButtonProps> = ({
       friction: 8,
     }).start();
 
-    // Reset progress
     Animated.timing(progressValue, {
       toValue: 0,
       duration: 200,
@@ -163,8 +158,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonImage: {
-    width: 120,
-    height: 120,
+    width: getWidthPercentage(45),
+    height: getHeightPercentage(20),
   },
   progressContainer: {
     position: 'absolute',

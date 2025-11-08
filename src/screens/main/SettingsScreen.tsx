@@ -17,6 +17,10 @@ import { SettingsSkeleton } from '../../components/Skeleton/SkeletonScreen';
 import { getCountryFlag, getCountryName, getCountry } from '../../utils/countryUtils';
 import CountryPickerModal, { Country } from '../../components/CountryPickerModal';
 import { moderateScale, scaleSize, scaleHeight, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage, getHeightPercentage } from '../../utils/scaling';
+import CommonStar from '../../assets/svg/stars/CommonStar';
+import RareStar from '../../assets/svg/stars/RareStar';
+import MythicStar from '../../assets/svg/stars/MythicStar';
+import LegendaryStar from '../../assets/svg/stars/LegendaryStar';
 
 export default function SettingsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList, 'SettingsScreen'>>();
@@ -112,7 +116,6 @@ export default function SettingsScreen() {
         ],
       });
 
-      // Обновляем user в контексте
       await refreshUser();
       
       showModal({
@@ -321,9 +324,10 @@ export default function SettingsScreen() {
 
           <View style={{flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start'}}>
             <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>{user.avatar.rarity}</Text>
-            {user.avatar.rarity === 'legendary' && <Image source={require('../../assets/img/stars/Legendary.png')}/>}
-            {user.avatar.rarity === 'rare' && <Image source={require('../../assets/img/stars/Rare.png')}/>}
-            {user.avatar.rarity === 'common' && <Image source={require('../../assets/img/stars/Common.png')}/>}
+            {user.avatar?.rarity === 'legendary' && <LegendaryStar />}
+            {user.avatar?.rarity === 'mythic' && <MythicStar />}
+            {user.avatar?.rarity === 'rare' && <RareStar  />} 
+            {user.avatar?.rarity === 'common' && <CommonStar />}
           </View>
 
           

@@ -17,6 +17,10 @@ import { useModal } from '../../context/ModalContext';
 import { StatsSkeleton } from '../../components/Skeleton/SkeletonScreen';
 import { getCountryFlag } from '../../utils/countryUtils';
 import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage, scaleSize } from '../../utils/scaling';
+import RareStar from '../../assets/svg/stars/RareStar';
+import CommonStar from '../../assets/svg/stars/CommonStar';
+import MythicStar from '../../assets/svg/stars/MythicStar';
+import LegendaryStar from '../../assets/svg/stars/LegendaryStar';
 
 interface Avatar {
   url: string;
@@ -24,6 +28,8 @@ interface Avatar {
 }
 
 interface LeaderboardEntry {
+  id?: string;
+  user_id?: string;
   nickname: string;
   country: string;
   avatar: Avatar;
@@ -77,7 +83,6 @@ export default function StatsScreen() {
     }
   };
 
-
   if (loading) {
     return <StatsSkeleton />;
   }
@@ -112,8 +117,18 @@ export default function StatsScreen() {
         {leaderboard.length > 0 ? (
           leaderboard.map((entry, index) => (    
             <AnimatedCard key={`${entry.nickname}-${index}`} delay={600 + (index * 200)} pressable={true}>
-              {/* <TouchableOpacity onPress={()=>{navigation.navigate('ReceiveHello', {ping: entry, showPingButton: false})}} style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row'}}> */}
-              <View style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: scaleBorderRadius(22), padding: scalePadding(16), alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row'}}>
+              <TouchableOpacity onPress={()=>{
+                const pingData = {
+                  id: entry.id,
+                  sender_id: entry.user_id || entry.id || '',
+                  sender_nickname: entry.nickname,
+                  sender_avatar: {
+                    url: entry.avatar.url,
+                    rarity: entry.avatar.rarity as 'common' | 'rare' | 'legendary',
+                  },
+                };
+                navigation.navigate('ReceiveHello', {ping: pingData, showPingButton: false});
+              }} style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row'}}>
 
                 <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
                   <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, marginRight: scaleMargin(12), minWidth: scaleSize(30)}}>
@@ -122,12 +137,11 @@ export default function StatsScreen() {
                   {entry.avatar.rarity === 'legendary' && (
                     <Image source={require('../../assets/img/stars/Legendary.png')}/>
                       )}
-                  {entry.avatar.rarity === 'rare' && (
-                    <Image source={require('../../assets/img/stars/Rare.png')}/>
-                      )}
-                  {entry.avatar.rarity === 'common' && (
-                    <Image source={require('../../assets/img/stars/Common.png')}/>
-                      )}
+                  {entry.avatar.rarity === 'rare' && <RareStar  />}
+                  {entry.avatar.rarity === 'common' && <CommonStar/>}
+                  {entry.avatar.rarity === 'mythic' && <MythicStar  />}
+                  {entry.avatar.rarity === 'legendary' && <LegendaryStar  />}
+
      
                   <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, flex: 1}}>
                     {entry.nickname}
@@ -142,7 +156,7 @@ export default function StatsScreen() {
                   </Text>
                   <FireSvg style={{marginLeft: scaleMargin(8), marginTop: scaleMargin(-10)}}/>
                 </View>
-              </View>
+              </TouchableOpacity>
             </AnimatedCard>
           ))
         ) : (
@@ -164,8 +178,6 @@ const styles = StyleSheet.create({
   container: { 
     flex: 1, 
     paddingTop: 60,
-    // padding: 16, 
-    // alignItems: 'center',
     backgroundColor: Colors.background,
   },
   backgroundImage: {

@@ -16,6 +16,10 @@ import { useModal } from '../../context/ModalContext';
 import { ReceiveHelloSkeleton } from '../../components/Skeleton/SkeletonScreen';
 import { getCountryFlag, getCountryName } from '../../utils/countryUtils';
 import { moderateScale, scaleSize, scaleHeight, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage, getHeightPercentage } from '../../utils/scaling';
+import LegendaryStar from '../../assets/svg/stars/LegendaryStar';
+import MythicStar from '../../assets/svg/stars/MythicStar';
+import RareStar from '../../assets/svg/stars/RareStar';
+import CommonStar from '../../assets/svg/stars/CommonStar';
 
 interface Ping {
   id?: string;
@@ -37,7 +41,7 @@ interface User {
   country?: string;
   avatar: {
     url: string;
-    rarity: 'common' | 'rare' | 'legendary';
+    rarity: 'common' | 'rare' | 'mythic' | 'legendary';
   };
   contacts: Array<{
     title: string;
@@ -53,22 +57,42 @@ export default function ReceiveHelloScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList, 'ReceiveHello'>>();
   const route = useRoute<ReceiveHelloRouteProp>();
   const { showModal } = useModal();
-  const {ping} = route.params;
+  const {ping, showPingButton = true} = route.params;
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
+      if (!ping.sender_id) {
+        showModal({
+          title: 'Error',
+          message: 'User ID is missing',
+          type: 'error',
+          onConfirm: () => {
+            navigation.goBack();
+          },
+        });
+        setLoading(false);
+        return;
+      }
+
       try {
         const response = await userManagementApi.getUser(ping.sender_id);
-        console.log('GetUser response:', response.data);
+        console.log('GetUser response:', response.data.avatar?.rarity);
         
-        // Обрабатываем оба варианта структуры ответа: { data: {...} } или прямой объект
-        const userData = response.data?.data || response.data;
+        const userData = response.data;
         setUser(userData);
       } catch (error: any) {
         console.error('Error fetching user:', error);
-        // При ошибке оставляем user как null, чтобы показать fallback UI
+        showModal({
+          title: 'Error',
+          message: 'Failed to fetch user',
+          type: 'error',
+          onConfirm: () => {
+            navigation.goBack();
+          },
+        });
         setUser(null);
       } finally {
         setLoading(false);
@@ -78,6 +102,15 @@ export default function ReceiveHelloScreen() {
   }, [ping]);
 
   const handleReportUser = () => {
+    if (!ping.sender_id) {
+      showModal({
+        title: 'Error',
+        message: 'Cannot report user: User ID is missing',
+        type: 'error',
+      });
+      return;
+    }
+
     showModal({
       title: 'Report User',
       message: `Are you sure you want to report ${ping.sender_nickname}? This action will be reviewed by our moderation team.`,
@@ -117,20 +150,18 @@ export default function ReceiveHelloScreen() {
     });
   };
 
-  const handleCopyContact = async () => {
-    try {
-      if (ping.sender_contacts && ping.sender_contacts.length > 0) {
-        await Clipboard.setString(ping.sender_contacts[0].url);
-      }
-    } catch (error: any) {
-      console.error('Error copying contact:', error);
-    }
-  };
-
   const handlePong = async () => {
     try {
-      await pingApi.sendPing();
-      navigation.goBack();
+      await pingApi.sendPingBack(ping.id);
+
+      showModal({
+        title: 'Ping sent',
+        message: 'Ping sent successfully!',
+        type: 'success',
+        onConfirm: () => {
+          navigation.goBack();
+        },
+      });
     } catch (error: any) {
       console.error('Error sending ping:', error);
       let errorMessage = 'Failed to send ping';
@@ -190,19 +221,23 @@ export default function ReceiveHelloScreen() {
         )}
       </View>
 
-      <View style={{backgroundColor: Colors.cardBackground, borderRadius: scaleBorderRadius(25), padding: scalePadding(16), width: getWidthPercentage(85), alignItems: 'center'}}>
-        <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
+      {user && (
+        <View style={{backgroundColor: Colors.cardBackground, borderRadius: scaleBorderRadius(25), padding: scalePadding(16), width: getWidthPercentage(85), alignItems: 'center'}}>
+          <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
 
-        <View style={{flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start'}}>
-          <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>{ping.sender_avatar.rarity}</Text>
-          {ping.sender_avatar.rarity === 'legendary' && <Image source={require('../../assets/img/stars/Legendary.png')}/>}
-          {ping.sender_avatar.rarity === 'rare' && <Image source={require('../../assets/img/stars/Rare.png')}/>}
-          {ping.sender_avatar.rarity === 'common' && <Image source={require('../../assets/img/stars/Common.png')}/>}
+          <View style={{flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start'}}>
+            <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>{ping.sender_avatar.rarity}</Text>
+            {user.avatar?.rarity === 'legendary' && <LegendaryStar />}
+            {user.avatar?.rarity === 'mythic' && <MythicStar />}
+            {user.avatar?.rarity === 'rare' && <RareStar  />} 
+            {user.avatar?.rarity === 'common' && <CommonStar />}
+          </View>
+
+          {user.avatar?.url && (
+            <Image source={{uri: user.avatar.url}} style={{width: getWidthPercentage(85), height: getHeightPercentage(30), maxHeight: scaleHeight(300)}} resizeMode='contain'/>
+          )}
         </View>
-
-        
-          <Image source={{uri: user.avatar.url}} style={{width: getWidthPercentage(85), height: getHeightPercentage(30), maxHeight: scaleHeight(300)}} resizeMode='contain'/>
-      </View>
+      )}
 
       <View style={{marginBottom: 0}}>
         
@@ -230,11 +265,12 @@ export default function ReceiveHelloScreen() {
 
       </View>
 
-      <GradientButton
+      {showPingButton && (  
+        <GradientButton
         title="Pong!"
         onPress={()=>{handlePong()}}
       />
-
+      )}
     </ScrollView>
   );
 }

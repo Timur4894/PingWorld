@@ -1,4 +1,3 @@
-// Централизованный экспорт всех API модулей
 import authApi from './authApi';
 import userManagementApi from './userManagementApi';
 import pingApi from './pingApi';

@@ -86,9 +86,9 @@ const CustomModal: React.FC<CustomModalProps> = ({
             <View style={[styles.confirmButtonContainer, showCancel && styles.confirmButtonWithCancel]}>
               <GradientButton
                 title={confirmText}
+                styleBtn={{width: getWidthPercentage(30), alignSelf: 'center'}}
                 onPress={handleConfirm}
               />
-                
             </View>
           </View>
         </View>
@@ -161,8 +161,6 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: scaleBorderRadius(25),
     overflow: 'hidden',
-    // borderWidth: 1,
-    // borderColor: Colors.borderButton,
   },
   confirmButtonTouchable: {
     flex: 1,

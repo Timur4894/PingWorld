@@ -12,7 +12,6 @@ const axiosClient = axios.create({
   },
 });
 
-// Загрузка токена из хранилища
 const loadToken = async () => {
   try {
     const token = await AsyncStorage.getItem(TOKEN_KEY);
@@ -27,7 +26,6 @@ const loadToken = async () => {
   }
 };
 
-// Сохранение токена
 export const saveToken = async (token) => {
   try {
     if (token) {
@@ -42,7 +40,6 @@ export const saveToken = async (token) => {
   }
 };
 
-// Сохранение refresh token
 export const saveRefreshToken = async (refreshToken) => {
   try {
     if (refreshToken) {
@@ -57,13 +54,11 @@ export const saveRefreshToken = async (refreshToken) => {
   }
 };
 
-// Очистка всех токенов
 export const clearTokens = async () => {
   await saveToken(null);
   await saveRefreshToken(null);
 };
 
-// Загрузка refresh token
 const loadRefreshToken = async () => {
   try {
     return await AsyncStorage.getItem(REFRESH_TOKEN_KEY);
@@ -73,7 +68,6 @@ const loadRefreshToken = async () => {
   }
 };
 
-// Обновление токена через refresh endpoint
 const refreshAccessToken = async () => {
   try {
     const refreshToken = await loadRefreshToken();
@@ -105,7 +99,6 @@ const refreshAccessToken = async () => {
       await saveToken(newToken);
       console.log('✅ Access token refreshed successfully');
       
-      // Сохраняем новый refresh token, если он есть
       if (newRefreshToken) {
         await saveRefreshToken(newRefreshToken);
         console.log('✅ Refresh token updated');
@@ -123,13 +116,11 @@ const refreshAccessToken = async () => {
   }
 };
 
-// Interceptor для добавления токена в запросы
 axiosClient.interceptors.request.use(
   async (config) => {
     const url = config.url || '';
     const isAuthEndpoint = url.includes('/auth/login') || url.includes('/auth/signup') || url.includes('/auth/refresh');
     
-    // Для auth endpoints не добавляем токен
     if (!isAuthEndpoint) {
       const token = await loadToken();
       if (token) {
@@ -156,15 +147,12 @@ axiosClient.interceptors.request.use(
   }
 );
 
-// Interceptor для обработки ответов и сохранения токенов
 axiosClient.interceptors.response.use(
   async (response) => {
     const url = response.config?.url || 'unknown';
     const isAuthEndpoint = url.includes('/auth/login') || url.includes('/auth/signup');
     
-    // После логина/регистрации сохраняем токен из ответа
     if (isAuthEndpoint && response.data) {
-      // Пробуем разные варианты структуры ответа
       const token = response.data?.data?.token || 
                    response.data?.data?.access_token || 
                    response.data?.token ||
@@ -199,7 +187,6 @@ axiosClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     
-    // Если получили 401 и это не auth endpoint, пробуем обновить токен
     if (error.response?.status === 401 && !originalRequest._retry) {
       const errorUrl = error.config?.url || '';
       const isAuthEndpoint = errorUrl.includes('/auth/login') || 
@@ -210,17 +197,14 @@ axiosClient.interceptors.response.use(
         console.error('❌ 401 UNAUTHORIZED on protected endpoint');
         console.log('   Request URL:', errorUrl);
         
-        // Пробуем обновить токен
         originalRequest._retry = true;
         const newToken = await refreshAccessToken();
         
         if (newToken) {
-          // Повторяем запрос с новым токеном
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           console.log('🔄 Retrying request with new token');
           return axiosClient(originalRequest);
         } else {
-          // Не удалось обновить токен - очищаем и возвращаем ошибку
           console.log('❌ Failed to refresh token, clearing auth data');
           await clearTokens();
         }

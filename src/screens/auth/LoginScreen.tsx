@@ -20,7 +20,6 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const onLogin = async () => {
-    // Валидация полей
     if (!nickname.trim()) {
       showModal({
         title: 'Error',
@@ -42,14 +41,11 @@ export default function LoginScreen() {
     try {
       setIsLoading(true);
       await login(nickname.trim(), password);
-      // После успешного логина навигация произойдет автоматически через AppNavigator
     } catch (error: any) {
       console.error('Login error:', error);
-      // Детальная обработка ошибок
       let errorMessage = 'Login failed';
       
       if (error.response) {
-        // Сервер вернул ошибку
         const status = error.response.status;
         const data = error.response.data;
         
@@ -63,10 +59,8 @@ export default function LoginScreen() {
           errorMessage = data?.message || data?.error || `Error: ${status}`;
         }
       } else if (error.request) {
-        // Запрос был отправлен, но ответа не получено
         errorMessage = 'Network error. Please check your connection';
       } else {
-        // Ошибка при настройке запроса
         errorMessage = error.message || 'An error occurred';
       }
       
@@ -166,7 +160,6 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   formContainer: {
-    // flex: 1,
     justifyContent: 'center',
     width: '100%',
     paddingHorizontal: scalePadding(20),

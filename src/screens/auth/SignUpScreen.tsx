@@ -24,7 +24,6 @@ export default function SignUpScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const onSignUp = async () => {
-    // Валидация полей
     if (!nickname.trim()) {
       showModal({
         title: 'Error',
@@ -61,11 +60,9 @@ export default function SignUpScreen() {
       await signup(nickname.trim(), password, contacts, selectedCountry?.code);
     } catch (error: any) {
       console.error('Signup error:', error);
-      // Детальная обработка ошибок
       let errorMessage = 'Signup failed';
       
       if (error.response) {
-        // Сервер вернул ошибку
         const status = error.response.status;
         const data = error.response.data;
         
@@ -77,10 +74,8 @@ export default function SignUpScreen() {
           errorMessage = data?.message || data?.error || `Error: ${status}`;
         }
       } else if (error.request) {
-        // Запрос был отправлен, но ответа не получено
         errorMessage = 'Network error. Please check your connection';
       } else {
-        // Ошибка при настройке запроса
         errorMessage = error.message || 'An error occurred';
       }
       
@@ -199,9 +194,6 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   header: {
-    // flexDirection: 'row',
-    // alignItems: 'center',
-    // justifyContent: 'space-between',
     width: '100%',
     marginTop: scaleMargin(20),
     marginBottom: scaleMargin(40),
@@ -213,7 +205,6 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   formContainer: {
-    // flex: 1,
     justifyContent: 'center',
     width: '100%',
     paddingHorizontal: scalePadding(20),
@@ -245,10 +236,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderColor: Colors.borderInput,
+
     borderRadius: scaleBorderRadius(20),
     paddingVertical: scalePadding(20),
     paddingHorizontal: scalePadding(16),
-    backgroundColor: 'transparent',
+    backgroundColor: Colors.cardBackground,
   },
   countryFlag: {
     fontSize: moderateScale(24),

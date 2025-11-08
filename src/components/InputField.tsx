@@ -1,5 +1,6 @@
 import React from "react";
 import { TextInput, StyleSheet, View, Text, TextInputProps } from "react-native";
+import LinearGradient from "react-native-linear-gradient";
 import { Colors } from "../constants/colors";
 import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius } from "../utils/scaling";
 
@@ -15,15 +16,25 @@ const InputField = ({ label, placeholder, secureTextEntry = false, value, onChan
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <TextInput
-        style={styles.input}
-        placeholder={placeholder}
-        placeholderTextColor="rgba(255,255,255,0.6)"
-        secureTextEntry={secureTextEntry}
-        value={value}
-        onChangeText={onChangeText}
-        {...props}
-      />
+      <LinearGradient
+        colors={['#1F43B7', '#FBF3F3', '#1A3AB5']}
+        locations={[0.25, 0.52, 0.97]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.gradientBorder}
+      >
+        <View style={styles.innerContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder={placeholder}
+            placeholderTextColor="rgba(255,255,255,0.6)"
+            secureTextEntry={secureTextEntry}
+            value={value}
+            onChangeText={onChangeText}
+            {...props}
+          />
+        </View>
+      </LinearGradient>
     </View>
   );
 };
@@ -43,16 +54,23 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: scaleMargin(12),
   },
+  gradientBorder: {
+    padding: 1.5,
+    borderRadius: scaleBorderRadius(20),
+  },
+  innerContainer: {
+    borderRadius: scaleBorderRadius(20),
+    backgroundColor: 'transparent',
+  },
   input: {
-    borderWidth: 2,
-    borderColor: Colors.borderInput,
     borderRadius: scaleBorderRadius(20),
     fontFamily: 'DynaPuff',
     paddingVertical: scalePadding(20),
     paddingHorizontal: scalePadding(16),
     fontSize: moderateScale(16),
     color: Colors.textPrimary,
-    backgroundColor: "transparent", // прозрачный фон
+    overflow: "hidden",
+    backgroundColor: Colors.cardBackground,
   },
 });
 

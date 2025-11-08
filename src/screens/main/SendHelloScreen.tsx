@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../navigation/MainStack';
 import WorldSvg from '../../assets/svg/WorldSvg';
@@ -43,10 +43,16 @@ export default function SendHelloScreen() {
   const [showAll, setShowAll] = useState(false);
   const [sendingPing, setSendingPing] = useState(false);
 
-  useEffect(() => {
-    fetchReceivedPings();
-    fetchUserStreak();
-  }, []);
+  
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        fetchReceivedPings();
+        fetchUserStreak();
+      };
+      fetchData();
+    }, [])
+  );
 
   const fetchReceivedPings = async () => {
     try {
