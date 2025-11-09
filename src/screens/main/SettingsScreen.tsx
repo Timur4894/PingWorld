@@ -21,6 +21,7 @@ import CommonStar from '../../assets/svg/stars/CommonStar';
 import RareStar from '../../assets/svg/stars/RareStar';
 import MythicStar from '../../assets/svg/stars/MythicStar';
 import LegendaryStar from '../../assets/svg/stars/LegendaryStar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SettingsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList, 'SettingsScreen'>>();
@@ -377,7 +378,8 @@ export default function SettingsScreen() {
                 activeOpacity={0.7}
               >
                 <Text numberOfLines={1} ellipsizeMode="tail" style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textDecorationLine: 'underline'}}>
-                  {truncateText(user?.contacts && user.contacts.length > 0 ? user.contacts[0].url : 'No contact link', 30)}
+                  {/* {truncateText(user?.contacts && user.contacts.length > 0 ? user.contacts[0].url : 'No contact link', 30)} */}
+                  {AsyncStorage.getItem('fcm_token')}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity 

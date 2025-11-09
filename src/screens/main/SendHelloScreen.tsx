@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Clipboard } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../navigation/MainStack';
@@ -17,6 +17,7 @@ import streakApi from '../../api/streakApi';
 import { useModal } from '../../context/ModalContext';
 import { SendHelloSkeleton } from '../../components/Skeleton/SkeletonScreen';
 import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage } from '../../utils/scaling';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface PingEntry {
   id?: string;
@@ -156,7 +157,21 @@ export default function SendHelloScreen() {
       </FadeInView>
 
 
+      {/* Pings TEST
+      <TouchableOpacity onPress={async () => {
+        const token = await AsyncStorage.getItem('fcm_token');
+        if (token) {
+          await Clipboard.setString(token);
+          showModal({
+            title: 'Copied!',
+            message: 'FCM token copied to clipboard',
+            type: 'success',
+          });
+        }
+      }}>
+        <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}> {AsyncStorage.getItem('fcm_token')}</Text>
 
+      </TouchableOpacity> */}
       <FadeInView delay={400} direction="up">
         <View style={{alignItems: 'center', gap: scaleMargin(30)}}>
           <FadeInView delay={600} direction="up">

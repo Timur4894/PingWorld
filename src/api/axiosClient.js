@@ -4,6 +4,28 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const TOKEN_KEY = 'auth_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
 
+const tokenRefreshCallbacks = [];
+
+export const onTokenRefresh = (callback) => {
+  tokenRefreshCallbacks.push(callback);
+  return () => {
+    const index = tokenRefreshCallbacks.indexOf(callback);
+    if (index > -1) {
+      tokenRefreshCallbacks.splice(index, 1);
+    }
+  };
+};
+
+const notifyTokenRefresh = () => {
+  tokenRefreshCallbacks.forEach(callback => {
+    try {
+      callback();
+    } catch (error) {
+      console.error('Error in token refresh callback:', error);
+    }
+  });
+};
+
 const axiosClient = axios.create({
   baseURL: 'https://ping-world-api-prod-150424932423.europe-west1.run.app',
   timeout: 10000,
@@ -103,6 +125,8 @@ const refreshAccessToken = async () => {
         await saveRefreshToken(newRefreshToken);
         console.log('✅ Refresh token updated');
       }
+      
+      notifyTokenRefresh();
       
       return newToken;
     }
