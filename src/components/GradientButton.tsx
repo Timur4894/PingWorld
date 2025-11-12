@@ -3,11 +3,13 @@ import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { moderateScale, scalePadding, scaleBorderRadius, getWidthPercentage } from "../utils/scaling";
 import { Colors } from "../constants/colors";
+import { triggerHaptic } from "../utils/hapticFeedback";
 
 interface GradientButtonProps {
   title: string;
   onPress: () => void;
   disabled?: boolean;
+  styleBtn?: any;
 }
 
 const GradientButton = ({ title, onPress, disabled = false, styleBtn }: GradientButtonProps) => {
@@ -21,7 +23,12 @@ const GradientButton = ({ title, onPress, disabled = false, styleBtn }: Gradient
     >
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={onPress}
+        onPress={() => {
+          if (!disabled) {
+            triggerHaptic('medium');
+            onPress();
+          }
+        }}
         disabled={disabled}
         style={styles.innerContainer}
       >

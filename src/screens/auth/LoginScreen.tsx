@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { HapticTouchableOpacity } from '../../components/HapticTouchableOpacity';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/AuthStack';
@@ -108,11 +109,11 @@ export default function LoginScreen() {
               value={password}
               onChangeText={setPassword}
             />
-            <TouchableOpacity onPress={() => navigation.replace('SignUpScreen')}>
+            <HapticTouchableOpacity onPress={() => navigation.replace('SignUpScreen')} hapticType="light">
               <Text style={styles.signUpText}>
                 Don't have an account yet? <Text style={styles.signUpLink}>Sign up</Text>
               </Text>
-            </TouchableOpacity>
+            </HapticTouchableOpacity>
            
           </View>
         </View>      

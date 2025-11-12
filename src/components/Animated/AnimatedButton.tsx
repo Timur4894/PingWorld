@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, Animated, ViewStyle, TextStyle } from 'react-native';
 import { moderateScale } from '../../utils/scaling';
+import { triggerHaptic } from '../../utils/hapticFeedback';
 
 interface AnimatedButtonProps {
   title?: string;
@@ -23,6 +24,9 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   const opacityValue = new Animated.Value(1);
 
   const handlePressIn = () => {
+    if (!disabled) {
+      triggerHaptic('light');
+    }
     Animated.parallel([
       Animated.spring(scaleValue, {
         toValue: 0.95,
@@ -66,7 +70,12 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
       ]}
     >
       <TouchableOpacity
-        onPress={onPress}
+        onPress={() => {
+          if (!disabled) {
+            triggerHaptic('medium');
+            onPress();
+          }
+        }}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         disabled={disabled}

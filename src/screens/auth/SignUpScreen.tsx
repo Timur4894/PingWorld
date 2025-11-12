@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { HapticTouchableOpacity } from '../../components/HapticTouchableOpacity';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/AuthStack';
@@ -132,9 +133,10 @@ export default function SignUpScreen() {
             onChangeText={setPassword}
           />
           
-          <TouchableOpacity
+          <HapticTouchableOpacity
             style={styles.countrySelector}
             onPress={() => setIsCountryPickerVisible(true)}
+            hapticType="light"
           >
             <Text style={styles.countryLabel}>Country</Text>
             <View style={styles.countrySelectorContent}>
@@ -148,13 +150,13 @@ export default function SignUpScreen() {
               )}
               <Text style={styles.arrow}>▼</Text>
             </View>
-          </TouchableOpacity>
+          </HapticTouchableOpacity>
       
-          <TouchableOpacity onPress={()=>{navigation.replace('Login')}}>
+          <HapticTouchableOpacity onPress={()=>{navigation.replace('Login')}} hapticType="light">
               <Text style={styles.signUpText}>
               Already have an account? <Text style={styles.signUpLink}>Log in</Text>
               </Text>
-          </TouchableOpacity>
+          </HapticTouchableOpacity>
          
         </View>
         </View>

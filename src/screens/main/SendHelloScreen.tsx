@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Clipboard } from 'react-native';
+import { View, Text, StyleSheet, Image, Clipboard } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../navigation/MainStack';
@@ -157,8 +157,8 @@ export default function SendHelloScreen() {
       </FadeInView>
 
 
-      {/* Pings TEST
-      <TouchableOpacity onPress={async () => {
+      {/* Pings TEST */}
+      {/* <TouchableOpacity onPress={async () => {
         const token = await AsyncStorage.getItem('fcm_token');
         if (token) {
           await Clipboard.setString(token);
@@ -170,14 +170,12 @@ export default function SendHelloScreen() {
         }
       }}>
         <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}> {AsyncStorage.getItem('fcm_token')}</Text>
-
       </TouchableOpacity> */}
       <FadeInView delay={400} direction="up">
-        <View style={{alignItems: 'center', gap: scaleMargin(30)}}>
+        <View style={{alignItems: 'center', gap: scaleMargin(30), marginTop: -50}}>
           <FadeInView delay={600} direction="up">
               <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>
-             You can send up to 5 pings per day
-              
+             You can send up to 5 pings per day 
             </Text>
           </FadeInView>
           <FadeInView delay={800} direction="up">

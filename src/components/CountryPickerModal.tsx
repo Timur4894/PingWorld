@@ -3,12 +3,12 @@ import {
   Modal,
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
   FlatList,
   TextInput,
   Dimensions,
 } from 'react-native';
+import { HapticTouchableOpacity } from './HapticTouchableOpacity';
 import { Colors } from '../constants/colors';
 import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage, getHeightPercentage, scaleSize } from '../utils/scaling';
 
@@ -170,20 +170,21 @@ const CountryPickerModal: React.FC<CountryPickerModalProps> = ({
   };
 
   const renderCountryItem = ({ item }: { item: Country }) => (
-    <TouchableOpacity
+    <HapticTouchableOpacity
       style={[
         styles.countryItem,
         selectedCountry?.code === item.code && styles.selectedCountryItem,
       ]}
       onPress={() => handleSelect(item)}
       activeOpacity={0.7}
+      hapticType="light"
     >
       <Text style={styles.flag}>{item.flag}</Text>
       <Text style={styles.countryName}>{item.name}</Text>
       {selectedCountry?.code === item.code && (
         <Text style={styles.checkmark}>✓</Text>
       )}
-    </TouchableOpacity>
+    </HapticTouchableOpacity>
   );
 
   return (
@@ -193,17 +194,18 @@ const CountryPickerModal: React.FC<CountryPickerModalProps> = ({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <TouchableOpacity 
+      <HapticTouchableOpacity 
         style={styles.overlay} 
         activeOpacity={1}
         onPress={onClose}
+        hapticType="light"
       >
         <View style={styles.modalContainer}>
           <View style={styles.header}>
             <Text style={styles.title}>Select Country</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <HapticTouchableOpacity onPress={onClose} style={styles.closeButton} hapticType="light">
               <Text style={styles.closeButtonText}>✕</Text>
-            </TouchableOpacity>
+            </HapticTouchableOpacity>
           </View>
 
           <View style={styles.searchContainer}>
@@ -228,7 +230,7 @@ const CountryPickerModal: React.FC<CountryPickerModalProps> = ({
             />
           </View>
         </View>
-      </TouchableOpacity>
+      </HapticTouchableOpacity>
     </Modal>
   );
 };

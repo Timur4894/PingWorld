@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Clipboard, ScrollView, Linking } from 'react-native';
+import { View, Text, StyleSheet, Image, Clipboard, ScrollView, Linking } from 'react-native';
+import { HapticTouchableOpacity } from '../../components/HapticTouchableOpacity';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../navigation/MainStack';
@@ -191,13 +192,13 @@ export default function ReceiveHelloScreen() {
   return (
     <ScrollView 
       style={styles.container}
-      contentContainerStyle={styles.scrollContent}
-      showsVerticalScrollIndicator={false}
+      contentContainerStyle={[styles.scrollContent, showPingButton ? {flexGrow: 1} : {flexGrow: 0.3}] }
+      showsVerticalScrollIndicator={showPingButton}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: getWidthPercentage(95), marginTop: scaleMargin(20)}}>
-        <TouchableOpacity onPress={()=>{navigation.goBack()}}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: getWidthPercentage(95), marginTop: scaleMargin(30)}}>
+        <HapticTouchableOpacity onPress={()=>{navigation.goBack()}} hapticType="light">
           <BackSvg />
-        </TouchableOpacity>
+        </HapticTouchableOpacity>
 
         <View style={{justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
           <Text style={{fontSize: moderateScale(22), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginRight: scaleMargin(8)}}>{user?.current_streak || 0}</Text>
@@ -206,7 +207,9 @@ export default function ReceiveHelloScreen() {
       </View>
 
       <View style={{alignItems: 'center', marginBottom: scaleMargin(10)}}>
-        <Text style={{fontSize: moderateScale(32), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>{ping.sender_nickname} {'\n'} <Text style={{fontSize: moderateScale(32), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, textAlign: 'center'}}>Pinged You</Text></Text>
+        <Text style={{fontSize: moderateScale(32), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>{ping.sender_nickname} {'\n'} 
+          {showPingButton && <Text style={{fontSize: moderateScale(32), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, textAlign: 'center'}}>Pinged You</Text>}
+          </Text>
         {user?.country && (
           <View style={{flexDirection: 'row', alignItems: 'center', marginTop: scaleMargin(8)}}>
             {getCountryFlag(user.country) && (
@@ -244,24 +247,25 @@ export default function ReceiveHelloScreen() {
         {user?.contacts && user.contacts.length > 0 && (
 
           <View style={{width: getWidthPercentage(85), backgroundColor: Colors.cardBackground, borderRadius: scaleBorderRadius(22), padding: scalePadding(16), alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row'}}>
-            <TouchableOpacity 
+            <HapticTouchableOpacity 
                 style={{flex: 1, marginRight: scaleMargin(8)}}
                 onPress={()=>{Linking.openURL(user?.contacts && user.contacts.length > 0 ? user.contacts[0].url : '')}}
                 activeOpacity={0.7}
+                hapticType="light"
               > 
                 <Text numberOfLines={1} ellipsizeMode="tail" style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textDecorationLine: 'underline'}}>
                   {user.contacts[0].url}
                 </Text> 
-              </TouchableOpacity>
-            <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}}>
+              </HapticTouchableOpacity>
+            <HapticTouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}} hapticType="light">
               <CopySvg style={{marginLeft: scaleMargin(8)}}/>
-            </TouchableOpacity>
+            </HapticTouchableOpacity>
           </View>
         )}
 
-        <TouchableOpacity onPress={()=>{handleReportUser()}}>
+        <HapticTouchableOpacity onPress={()=>{handleReportUser()}} hapticType="light">
           <Text style={{alignSelf: "center", fontSize: moderateScale(14), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError,  marginTop: scaleMargin(10)}}>Report link or user</Text>
-        </TouchableOpacity>
+        </HapticTouchableOpacity>
 
       </View>
 
@@ -281,7 +285,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.backgroundSettings,
   },
   scrollContent: {
-    flexGrow: 1,
+      // flexGrow: 1,
     justifyContent: 'space-around',
     padding: scalePadding(16), 
     alignItems: 'center',

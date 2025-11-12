@@ -1,5 +1,7 @@
 import React, { useRef, useEffect } from 'react';
-import { View, StyleSheet, Animated, ViewStyle, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Animated, ViewStyle } from 'react-native';
+import { HapticTouchableOpacity } from '../HapticTouchableOpacity';
+import { triggerHaptic } from '../../utils/hapticFeedback';
 
 interface AnimatedCardProps {
   children: React.ReactNode;
@@ -40,6 +42,7 @@ const AnimatedCard: React.FC<AnimatedCardProps> = ({
 
   const handlePressIn = () => {
     if (pressable) {
+      triggerHaptic('light');
       Animated.spring(pressScale, {
         toValue: 0.95,
         useNativeDriver: true,
@@ -60,7 +63,14 @@ const AnimatedCard: React.FC<AnimatedCardProps> = ({
     }
   };
 
-  const CardComponent = pressable ? TouchableOpacity : View;
+  const handlePress = () => {
+    if (pressable && onPress) {
+      triggerHaptic('medium');
+      onPress();
+    }
+  };
+
+  const CardComponent = pressable ? HapticTouchableOpacity : View;
 
   return (
     <Animated.View
@@ -76,11 +86,12 @@ const AnimatedCard: React.FC<AnimatedCardProps> = ({
       ]}
     >
       <CardComponent
-        onPress={onPress}
+        onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={pressable ? 0.9 : 1}
         style={styles.card}
+        hapticType="light"
       >
         {children}
       </CardComponent>

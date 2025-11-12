@@ -21,7 +21,7 @@ interface Ping {
 
 export type MainStackParamList = {
   SendHello: undefined;
-  ReceiveHello: { ping: Ping };
+  ReceiveHello: { ping: Ping; showPingButton?: boolean };
   StatsScreen: undefined;
   SettingsScreen: undefined;
 };
