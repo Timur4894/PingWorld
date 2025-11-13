@@ -20,6 +20,8 @@
     "@reduxjs/toolkit": "^2.10.1",
     "@tanstack/react-query": "^5.85.5",
     "axios": "^1.11.0",
+    "lottie-ios": "^4.5.0",
+    "lottie-react-native": "^7.3.4",
     "react": "19.1.0",
     "react-native": "0.80.0",
     "react-native-haptic-feedback": "^2.3.3",

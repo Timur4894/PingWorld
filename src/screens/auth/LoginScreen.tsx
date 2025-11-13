@@ -9,7 +9,8 @@ import InputField from '../../components/InputField';
 import { Colors } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
 import { useModal } from '../../context/ModalContext';
-import { moderateScale, scalePadding, scaleMargin } from '../../utils/scaling';
+import { moderateScale, scalePadding, scaleMargin, scaleSize } from '../../utils/scaling';
+import LottieView from 'lottie-react-native';
 
 
 export default function LoginScreen() {
@@ -91,7 +92,15 @@ export default function LoginScreen() {
          
           <View style={styles.header}>
             <Text style={styles.title}>Log in</Text>
-            <Image source={require('../../assets/img/Roket.png')}/>
+            {/* <Image source={require('../../assets/img/Roket.png')}/> */}
+            <LottieView
+                source={require('../../assets/animations/Rocket.json')}
+                autoPlay={true}
+                loop={true}
+                speed={1}
+              
+                style={{ width: scaleSize(100), height: scaleSize(100) }}
+              />   
           </View>
           
           <View style={styles.formContainer}>

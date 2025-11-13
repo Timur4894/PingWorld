@@ -16,8 +16,9 @@ import pingApi from '../../api/pingApi';
 import streakApi from '../../api/streakApi';
 import { useModal } from '../../context/ModalContext';
 import { SendHelloSkeleton } from '../../components/Skeleton/SkeletonScreen';
-import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage } from '../../utils/scaling';
+import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage, scaleSize } from '../../utils/scaling';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LottieView from 'lottie-react-native';
 
 interface PingEntry {
   id?: string;
@@ -146,7 +147,14 @@ export default function SendHelloScreen() {
                   {currentStreak}
                 </Text>
               </PulseView>
-              <FireSvg style={{marginBottom: scaleMargin(10), marginLeft: scaleMargin(8)}}/>
+              {/* <FireSvg style={{marginBottom: scaleMargin(10), marginLeft: scaleMargin(8)}}/> */}
+              <LottieView
+                source={require('../../assets/animations/Fire.json')}
+                autoPlay={true}
+                loop={true}
+                speed={1}
+                style={{ width: scaleSize(30), height: scaleSize(30) }}
+              />       
             </View>
           </FadeInView>
 

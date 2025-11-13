@@ -22,6 +22,7 @@ import RareStar from '../../assets/svg/stars/RareStar';
 import CommonStar from '../../assets/svg/stars/CommonStar';
 import MythicStar from '../../assets/svg/stars/MythicStar';
 import LegendaryStar from '../../assets/svg/stars/LegendaryStar';
+import LottieView from 'lottie-react-native';
 
 interface Avatar {
   url: string;
@@ -153,7 +154,14 @@ export default function StatsScreen() {
                   <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>
                     {entry.current_streak}
                   </Text>
-                  <FireSvg style={{marginLeft: scaleMargin(8), marginTop: scaleMargin(-10)}}/>
+                  <LottieView
+                source={require('../../assets/animations/Fire.json')}
+                autoPlay={true}
+                loop={true}
+                speed={1}
+              
+                style={{ width: scaleSize(30), height: scaleSize(30) }}
+              />   
                 </View>
               </HapticTouchableOpacity>
             </AnimatedCard>

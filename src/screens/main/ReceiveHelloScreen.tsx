@@ -21,6 +21,7 @@ import LegendaryStar from '../../assets/svg/stars/LegendaryStar';
 import MythicStar from '../../assets/svg/stars/MythicStar';
 import RareStar from '../../assets/svg/stars/RareStar';
 import CommonStar from '../../assets/svg/stars/CommonStar';
+import LottieView from 'lottie-react-native';
 
 interface Ping {
   id?: string;
@@ -202,7 +203,15 @@ export default function ReceiveHelloScreen() {
 
         <View style={{justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
           <Text style={{fontSize: moderateScale(22), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginRight: scaleMargin(8)}}>{user?.current_streak || 0}</Text>
-          <FireSvg />
+         
+          <LottieView
+                source={require('../../assets/animations/Fire.json')}
+                autoPlay={true}
+                loop={true}
+                speed={1}
+                
+                style={{ width: scaleSize(30), height: scaleSize(30) }}
+              />   
         </View>
       </View>
 

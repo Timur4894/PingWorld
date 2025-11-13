@@ -10,7 +10,8 @@ import { Colors } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
 import { useModal } from '../../context/ModalContext';
 import CountryPickerModal, { Country } from '../../components/CountryPickerModal';
-import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage } from '../../utils/scaling';
+import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage, scaleSize } from '../../utils/scaling';
+import LottieView from 'lottie-react-native';
 
 
 export default function SignUpScreen() {
@@ -108,6 +109,14 @@ export default function SignUpScreen() {
         
         <View style={styles.header}>
           <Text style={styles.title}>Your account</Text>
+          <LottieView
+                source={require('../../assets/animations/sparkles.json')}
+                autoPlay={true}
+                loop={true}
+                speed={1}
+              
+                style={{ width: scaleSize(100), height: scaleSize(100) }}
+              />   
         </View>
         
         <View style={styles.formContainer}>
@@ -199,6 +208,9 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: scaleMargin(20),
     marginBottom: scaleMargin(40),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: { 
     fontSize: moderateScale(38), 

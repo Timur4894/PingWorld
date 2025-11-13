@@ -22,6 +22,7 @@ import CommonStar from '../../assets/svg/stars/CommonStar';
 import RareStar from '../../assets/svg/stars/RareStar';
 import MythicStar from '../../assets/svg/stars/MythicStar';
 import LegendaryStar from '../../assets/svg/stars/LegendaryStar';
+import LottieView from 'lottie-react-native';
 
 export default function SettingsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList, 'SettingsScreen'>>();
@@ -279,9 +280,20 @@ export default function SettingsScreen() {
         </View>
 
         <View style={{alignItems: 'center', marginBottom: scaleMargin(10)}}>
-          <Text style={{fontSize: moderateScale(32), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>
-            My avatar
-          </Text>
+          <View style={{flexDirection: 'row'}}>
+            <Text style={{fontSize: moderateScale(32), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>
+              My avatar
+            </Text>
+            <LottieView
+                  source={require('../../assets/animations/sparkles.json')}
+                  autoPlay={true}
+                  loop={true}
+                  speed={1}
+                
+                  style={{ width: scaleSize(150), height: scaleSize(150), position: 'absolute', right: -120, bottom: -50 }}
+                />   
+          </View>
+          
           <HapticTouchableOpacity 
             style={{flexDirection: 'row', alignItems: 'center', marginTop: scaleMargin(8)}} 
             onPress={()=>{setIsCountryPickerVisible(true)}}
@@ -341,7 +353,14 @@ export default function SettingsScreen() {
             <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>Your streak</Text>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontSize: moderateScale(20), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginRight: scaleMargin(8)}}>{user.current_streak}</Text>
-              <FireSvg style={{marginTop: scaleMargin(-10)}}/>
+              {/* <FireSvg style={{marginTop: scaleMargin(-10)}}/> */}
+              <LottieView
+                source={require('../../assets/animations/Fire.json')}
+                autoPlay
+                loop
+                speed={1}
+                style={{ width: scaleSize(30), height: scaleSize(30) }}
+              /> 
             </View>
           </View>
           {isEditing ? (
