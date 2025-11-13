@@ -10,6 +10,7 @@ import {
 import { LinearGradient } from 'react-native-linear-gradient';
 import { Colors } from '../constants/colors';
 import GradientButton from './GradientButton';
+import { triggerHaptic } from '../utils/hapticFeedback';
 import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage, scaleSize } from '../utils/scaling';
 
 export type ModalType = 'error' | 'success' | 'info' | 'warning';
@@ -77,7 +78,10 @@ const CustomModal: React.FC<CustomModalProps> = ({
             {showCancel && (
               <TouchableOpacity
                 style={styles.cancelButton}
-                onPress={onClose}
+                onPress={() => {
+                  triggerHaptic('light');
+                  onClose();
+                }}
                 activeOpacity={0.8}
               >
                 <Text style={styles.cancelButtonText}>{cancelText}</Text>

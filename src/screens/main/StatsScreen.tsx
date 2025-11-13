@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { HapticTouchableOpacity } from '../../components/HapticTouchableOpacity';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../navigation/MainStack';
@@ -21,6 +22,7 @@ import RareStar from '../../assets/svg/stars/RareStar';
 import CommonStar from '../../assets/svg/stars/CommonStar';
 import MythicStar from '../../assets/svg/stars/MythicStar';
 import LegendaryStar from '../../assets/svg/stars/LegendaryStar';
+import LottieView from 'lottie-react-native';
 
 interface Avatar {
   url: string;
@@ -92,7 +94,7 @@ export default function StatsScreen() {
       <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
 
       <FadeInView delay={0} direction="down" style={{alignSelf: 'flex-start', width: getWidthPercentage(95),marginLeft: scaleMargin(16) }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center',marginBottom: scaleMargin(20)}}>
+        <View style={{ flexDirection: 'row', alignItems: 'center',marginBottom: scaleMargin(20),marginTop: scaleMargin(10)}}>
           <AnimatedButton onPress={()=>{navigation.goBack()}}>
             <BackSvg />
           </AnimatedButton>
@@ -117,7 +119,7 @@ export default function StatsScreen() {
         {leaderboard.length > 0 ? (
           leaderboard.map((entry, index) => (    
             <AnimatedCard key={`${entry.nickname}-${index}`} delay={600 + (index * 200)} pressable={true}>
-              <TouchableOpacity onPress={()=>{
+              <HapticTouchableOpacity onPress={()=>{
                 const pingData = {
                   id: entry.id,
                   sender_id: entry.user_id || entry.id || '',
@@ -128,7 +130,7 @@ export default function StatsScreen() {
                   },
                 };
                 navigation.navigate('ReceiveHello', {ping: pingData, showPingButton: false});
-              }} style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row'}}>
+              }} style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: 22, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row'}} hapticType="light">
 
                 <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
                   <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, marginRight: scaleMargin(12), minWidth: scaleSize(30)}}>
@@ -152,9 +154,16 @@ export default function StatsScreen() {
                   <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>
                     {entry.current_streak}
                   </Text>
-                  <FireSvg style={{marginLeft: scaleMargin(8), marginTop: scaleMargin(-10)}}/>
+                  <LottieView
+                source={require('../../assets/animations/Fire.json')}
+                autoPlay={true}
+                loop={true}
+                speed={1}
+              
+                style={{ width: scaleSize(30), height: scaleSize(30) }}
+              />   
                 </View>
-              </TouchableOpacity>
+              </HapticTouchableOpacity>
             </AnimatedCard>
           ))
         ) : (

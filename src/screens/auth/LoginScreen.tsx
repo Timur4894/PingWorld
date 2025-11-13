@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { HapticTouchableOpacity } from '../../components/HapticTouchableOpacity';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/AuthStack';
@@ -8,7 +9,8 @@ import InputField from '../../components/InputField';
 import { Colors } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
 import { useModal } from '../../context/ModalContext';
-import { moderateScale, scalePadding, scaleMargin } from '../../utils/scaling';
+import { moderateScale, scalePadding, scaleMargin, scaleSize } from '../../utils/scaling';
+import LottieView from 'lottie-react-native';
 
 
 export default function LoginScreen() {
@@ -90,7 +92,15 @@ export default function LoginScreen() {
          
           <View style={styles.header}>
             <Text style={styles.title}>Log in</Text>
-            <Image source={require('../../assets/img/Roket.png')}/>
+            {/* <Image source={require('../../assets/img/Roket.png')}/> */}
+            <LottieView
+                source={require('../../assets/animations/Rocket.json')}
+                autoPlay={true}
+                loop={true}
+                speed={1}
+              
+                style={{ width: scaleSize(100), height: scaleSize(100) }}
+              />   
           </View>
           
           <View style={styles.formContainer}>
@@ -108,11 +118,11 @@ export default function LoginScreen() {
               value={password}
               onChangeText={setPassword}
             />
-            <TouchableOpacity onPress={() => navigation.replace('SignUpScreen')}>
+            <HapticTouchableOpacity onPress={() => navigation.replace('SignUpScreen')} hapticType="light">
               <Text style={styles.signUpText}>
                 Don't have an account yet? <Text style={styles.signUpLink}>Sign up</Text>
               </Text>
-            </TouchableOpacity>
+            </HapticTouchableOpacity>
            
           </View>
         </View>      

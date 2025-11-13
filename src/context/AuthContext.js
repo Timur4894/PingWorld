@@ -148,6 +148,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const deleteAccount = async () => {
+    console.log('token', await AsyncStorage.getItem(TOKEN_KEY));
     try {
       await userManagementApi.deleteMe();
       await clearTokens();

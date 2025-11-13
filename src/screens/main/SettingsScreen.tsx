@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform, Dimensions, Clipboard, Linking } from 'react-native';
+import { View, Text, StyleSheet, Image, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform, Dimensions, Clipboard, Linking } from 'react-native';
+import { HapticTouchableOpacity } from '../../components/HapticTouchableOpacity';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../navigation/MainStack';
@@ -21,7 +22,7 @@ import CommonStar from '../../assets/svg/stars/CommonStar';
 import RareStar from '../../assets/svg/stars/RareStar';
 import MythicStar from '../../assets/svg/stars/MythicStar';
 import LegendaryStar from '../../assets/svg/stars/LegendaryStar';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import LottieView from 'lottie-react-native';
 
 export default function SettingsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList, 'SettingsScreen'>>();
@@ -271,20 +272,32 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: getWidthPercentage(95), marginTop: scaleMargin(20)}}>
-          <TouchableOpacity onPress={()=>{navigation.goBack()}}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: getWidthPercentage(95), marginTop: scaleMargin(30)}}>
+          <HapticTouchableOpacity onPress={()=>{navigation.goBack()}} hapticType="light">
             <BackSvg />
-          </TouchableOpacity>
+          </HapticTouchableOpacity>
          
         </View>
 
         <View style={{alignItems: 'center', marginBottom: scaleMargin(10)}}>
-          <Text style={{fontSize: moderateScale(32), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>
-            My avatar
-          </Text>
-          <TouchableOpacity 
+          <View style={{flexDirection: 'row'}}>
+            <Text style={{fontSize: moderateScale(32), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>
+              My avatar
+            </Text>
+            <LottieView
+                  source={require('../../assets/animations/sparkles.json')}
+                  autoPlay={true}
+                  loop={true}
+                  speed={1}
+                
+                  style={{ width: scaleSize(150), height: scaleSize(150), position: 'absolute', right: -120, bottom: -50 }}
+                />   
+          </View>
+          
+          <HapticTouchableOpacity 
             style={{flexDirection: 'row', alignItems: 'center', marginTop: scaleMargin(8)}} 
             onPress={()=>{setIsCountryPickerVisible(true)}}
+            hapticType="light"
           >
             {user?.country ? (
               <>
@@ -306,7 +319,7 @@ export default function SettingsScreen() {
                 <EditSvg color={Colors.textPrimary} style={{marginLeft: scaleMargin(8)}}/>
               </>
             )}
-          </TouchableOpacity>
+          </HapticTouchableOpacity>
         </View>
 
         {selectedCountry && selectedCountry.code !== user?.country && (
@@ -340,7 +353,14 @@ export default function SettingsScreen() {
             <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>Your streak</Text>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontSize: moderateScale(20), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, marginRight: scaleMargin(8)}}>{user.current_streak}</Text>
-              <FireSvg style={{marginTop: scaleMargin(-10)}}/>
+              {/* <FireSvg style={{marginTop: scaleMargin(-10)}}/> */}
+              <LottieView
+                source={require('../../assets/animations/Fire.json')}
+                autoPlay
+                loop
+                speed={1}
+                style={{ width: scaleSize(30), height: scaleSize(30) }}
+              /> 
             </View>
           </View>
           {isEditing ? (
@@ -351,64 +371,68 @@ export default function SettingsScreen() {
                 value={editedUrl}
                 onChangeText={setEditedUrl}
               />
-              <View style={{flexDirection: 'column', width: getWidthPercentage(85), gap: scaleMargin(12), marginTop: scaleMargin(12), justifyContent: 'center', alignItems: 'center'}}>
+              <View style={{  flexDirection: 'column', gap: scaleMargin(12), marginTop: scaleMargin(12), justifyContent: 'center', alignItems: 'center'}}>
                 
-                <View style={{width: getWidthPercentage(90)}}>
+                <View style={{}}>
                   <GradientButton
                     title={isSaving ? "Saving..." : "Save"}
                     onPress={handleSaveContact}
                     disabled={isSaving}
                   />
                 </View>
-                <TouchableOpacity
+                <HapticTouchableOpacity
                   onPress={handleCancelEdit}
                   style={styles.cancelButton}
                   disabled={isSaving}
+                  hapticType="light"
                 >
                   <Text style={styles.cancelButtonText}>Cancel</Text>
-                </TouchableOpacity>
+                </HapticTouchableOpacity>
               </View>
             </>
           ) : (
             <>
             <View style={{width: getWidthPercentage(85), backgroundColor: Colors.cardBackground, borderRadius: scaleBorderRadius(22), padding: scalePadding(16), alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row', marginBottom: scaleMargin(12)}}>
-              <TouchableOpacity 
+              <HapticTouchableOpacity 
                 style={{flex: 1, marginRight: scaleMargin(8)}}
                 onPress={()=>{Linking.openURL(user?.contacts && user.contacts.length > 0 ? user.contacts[0].url : '')}}
                 activeOpacity={0.7}
+                hapticType="light"
               >
                 <Text numberOfLines={1} ellipsizeMode="tail" style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textDecorationLine: 'underline'}}>
-                  {/* {truncateText(user?.contacts && user.contacts.length > 0 ? user.contacts[0].url : 'No contact link', 30)} */}
-                  {AsyncStorage.getItem('fcm_token')}
+                  {truncateText(user?.contacts && user.contacts.length > 0 ? user.contacts[0].url : 'No contact link', 30)}
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
+              </HapticTouchableOpacity>
+              <HapticTouchableOpacity 
                 style={{flexDirection: 'row', alignItems: 'center'}}
                 onPress={handleEditContact}
+                hapticType="light"
               >
                   <EditSvg style={{marginLeft: scaleMargin(8)}}/>
-                </TouchableOpacity>
+                </HapticTouchableOpacity>
               </View>
-              <TouchableOpacity 
+              <HapticTouchableOpacity 
               onPress={handleLogout}
+              hapticType="medium"
             >
             <Text style={{alignSelf: "center", fontSize: moderateScale(14), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError,  marginTop: scaleMargin(10)}}>Logout</Text>
-          </TouchableOpacity>
+          </HapticTouchableOpacity>
           </>
           )}
         </View>
         
         {!isEditing  && (
-            <TouchableOpacity 
+            <HapticTouchableOpacity 
             onPress={handleDeleteAccount}
             disabled={isDeleting}
+            hapticType="medium"
             >
               {isDeleting ? (
                 <ActivityIndicator size="small" color={Colors.textError} />
               ) : (
                 <Text style={{alignSelf: "center", fontSize: moderateScale(14), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError,  marginTop: scaleMargin(10)}}>Delete account</Text>
               )}
-            </TouchableOpacity>
+            </HapticTouchableOpacity>
           )
           }
       </ScrollView>

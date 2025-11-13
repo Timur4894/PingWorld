@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { HapticTouchableOpacity } from '../../components/HapticTouchableOpacity';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/AuthStack';
@@ -9,7 +10,8 @@ import { Colors } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
 import { useModal } from '../../context/ModalContext';
 import CountryPickerModal, { Country } from '../../components/CountryPickerModal';
-import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage } from '../../utils/scaling';
+import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage, scaleSize } from '../../utils/scaling';
+import LottieView from 'lottie-react-native';
 
 
 export default function SignUpScreen() {
@@ -107,6 +109,14 @@ export default function SignUpScreen() {
         
         <View style={styles.header}>
           <Text style={styles.title}>Your account</Text>
+          <LottieView
+                source={require('../../assets/animations/sparkles.json')}
+                autoPlay={true}
+                loop={true}
+                speed={1}
+              
+                style={{ width: scaleSize(100), height: scaleSize(100) }}
+              />   
         </View>
         
         <View style={styles.formContainer}>
@@ -132,9 +142,10 @@ export default function SignUpScreen() {
             onChangeText={setPassword}
           />
           
-          <TouchableOpacity
+          <HapticTouchableOpacity
             style={styles.countrySelector}
             onPress={() => setIsCountryPickerVisible(true)}
+            hapticType="light"
           >
             <Text style={styles.countryLabel}>Country</Text>
             <View style={styles.countrySelectorContent}>
@@ -148,13 +159,13 @@ export default function SignUpScreen() {
               )}
               <Text style={styles.arrow}>▼</Text>
             </View>
-          </TouchableOpacity>
+          </HapticTouchableOpacity>
       
-          <TouchableOpacity onPress={()=>{navigation.replace('Login')}}>
+          <HapticTouchableOpacity onPress={()=>{navigation.replace('Login')}} hapticType="light">
               <Text style={styles.signUpText}>
               Already have an account? <Text style={styles.signUpLink}>Log in</Text>
               </Text>
-          </TouchableOpacity>
+          </HapticTouchableOpacity>
          
         </View>
         </View>
@@ -195,11 +206,15 @@ const styles = StyleSheet.create({
   },
   header: {
     width: '100%',
+    flexWrap: 'wrap',
     marginTop: scaleMargin(20),
     marginBottom: scaleMargin(40),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: { 
-    fontSize: moderateScale(38), 
+    fontSize: moderateScale(32), 
     fontWeight: '800', 
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
