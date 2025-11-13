@@ -206,6 +206,7 @@ const styles = StyleSheet.create({
   },
   header: {
     width: '100%',
+    flexWrap: 'wrap',
     marginTop: scaleMargin(20),
     marginBottom: scaleMargin(40),
     flexDirection: 'row',
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: { 
-    fontSize: moderateScale(38), 
+    fontSize: moderateScale(32), 
     fontWeight: '800', 
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
