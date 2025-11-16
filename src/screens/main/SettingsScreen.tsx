@@ -261,11 +261,15 @@ export default function SettingsScreen() {
     return <SettingsSkeleton />;
   }
 
+  const Container = Platform.OS === 'ios' ? KeyboardAvoidingView : View;
+  const containerProps = Platform.OS === 'ios' 
+    ? { behavior: 'padding' as const, keyboardVerticalOffset: 0 }
+    : {};
+
   return (
-    <KeyboardAvoidingView 
+    <Container 
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      {...containerProps}
     >
       <ScrollView 
         contentContainerStyle={styles.scrollContent}
@@ -411,30 +415,35 @@ export default function SettingsScreen() {
                   <EditSvg style={{marginLeft: scaleMargin(8)}}/>
                 </HapticTouchableOpacity>
               </View>
+              <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '80%'}}>
               <HapticTouchableOpacity 
-              onPress={handleLogout}
-              hapticType="medium"
-            >
-            <Text style={{alignSelf: "center", fontSize: moderateScale(14), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError,  marginTop: scaleMargin(10)}}>Logout</Text>
-          </HapticTouchableOpacity>
+                onPress={handleLogout}
+                hapticType="medium"
+              >
+                  <Text style={{alignSelf: "center", fontSize: moderateScale(14), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError,  marginTop: scaleMargin(10)}}>Logout</Text>
+                </HapticTouchableOpacity>
+                {!isEditing  && (
+                  <HapticTouchableOpacity 
+                  onPress={handleDeleteAccount}
+                  disabled={isDeleting}
+                  hapticType="medium"
+                  >
+                    {isDeleting ? (
+                      <ActivityIndicator size="small" color={Colors.textError} />
+                    ) : (
+                      <Text style={{alignSelf: "center", fontSize: moderateScale(14), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError,  marginTop: scaleMargin(10)}}>Delete account</Text>
+                    )}
+                  </HapticTouchableOpacity>
+                )
+              }
+              </View>
+          
           </>
           )}
+          
         </View>
         
-        {!isEditing  && (
-            <HapticTouchableOpacity 
-            onPress={handleDeleteAccount}
-            disabled={isDeleting}
-            hapticType="medium"
-            >
-              {isDeleting ? (
-                <ActivityIndicator size="small" color={Colors.textError} />
-              ) : (
-                <Text style={{alignSelf: "center", fontSize: moderateScale(14), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError,  marginTop: scaleMargin(10)}}>Delete account</Text>
-              )}
-            </HapticTouchableOpacity>
-          )
-          }
+        
       </ScrollView>
       
       <CountryPickerModal
@@ -443,7 +452,7 @@ export default function SettingsScreen() {
         onSelect={setSelectedCountry}
         onClose={() => setIsCountryPickerVisible(false)}
       />
-    </KeyboardAvoidingView>
+    </Container>
   );
 }
 

@@ -9,12 +9,10 @@ function AppContent() {
   useFCM();
 
   return (
-    <ModalProvider>
-      <View style={styles.container}>
-        <StatusBar barStyle={'light-content'} />
-        <AppNavigator />
-      </View>
-    </ModalProvider>
+    <View style={styles.container}>
+      <StatusBar barStyle={'light-content'} />
+      <AppNavigator />
+    </View>
   );
 }
 
@@ -23,7 +21,9 @@ function App() {
 
   return (
     <AuthProvider>
-      <AppContent />
+      <ModalProvider>
+        <AppContent />
+      </ModalProvider>
     </AuthProvider>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, Image, Clipboard } from 'react-native';
+import { View, Text, StyleSheet, Image, Clipboard, TouchableOpacity } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../navigation/MainStack';
@@ -16,7 +16,7 @@ import pingApi from '../../api/pingApi';
 import streakApi from '../../api/streakApi';
 import { useModal } from '../../context/ModalContext';
 import { SendHelloSkeleton } from '../../components/Skeleton/SkeletonScreen';
-import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage, scaleSize } from '../../utils/scaling';
+import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage, scaleSize, scaleHeight } from '../../utils/scaling';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LottieView from 'lottie-react-native';
 
@@ -44,13 +44,14 @@ export default function SendHelloScreen() {
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
   const [sendingPing, setSendingPing] = useState(false);
+  const [remainingPings, setRemainingPings] = useState<number>(0);
 
-  
   useFocusEffect(
     useCallback(() => {
       const fetchData = async () => {
         fetchReceivedPings();
         fetchUserStreak();
+        fetchRemainingPings();
       };
       fetchData();
     }, [])
@@ -73,13 +74,25 @@ export default function SendHelloScreen() {
   const fetchUserStreak = async () => {
     try {
       const response = await streakApi.getUserStreak();
-      const responseData = response.data?.data || response.data;
+      const responseData = response.data.data || response.data;
       setCurrentStreak(responseData?.current_streak || responseData?.streak || 0);
       setPingsRemaining(responseData?.pings_remaining || responseData?.remaining || 3);
     } catch (error: any) {
       console.error('Error fetching user streak:', error);
       setCurrentStreak(0);
       setPingsRemaining(3);
+    }
+  };
+
+  const fetchRemainingPings = async () => {
+    try {
+      const response = await pingApi.getRemainingPings();
+      const responseData = response.data.data
+      console.log('Remaining pings:', responseData);
+      setRemainingPings(responseData || 0);
+    } catch (error: any) {
+      console.error('Error fetching remaining pings:', error);
+      setRemainingPings(0);
     }
   };
 
@@ -90,6 +103,7 @@ export default function SendHelloScreen() {
       setSendingPing(true);
       await pingApi.sendPing();
       await fetchUserStreak();
+      setRemainingPings(remainingPings - 1);
       showModal({
         title: 'Success',
         message: 'Ping sent successfully!',
@@ -123,6 +137,10 @@ export default function SendHelloScreen() {
     setShowAll(true);
   };
 
+  const handleShowLess = () => {
+    setShowAll(false);
+  };
+
   const displayPings = showAll ? receivedPings : receivedPings.slice(0, 2);
 
   if (loading) {
@@ -131,19 +149,20 @@ export default function SendHelloScreen() {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
-
+     {
+      remainingPings > 0 ? <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/> : <Image source={require('../../assets/img/nopingsbg.png')} style={styles.backgroundImage} resizeMode='stretch'/>
+     } 
 
       <FadeInView delay={0} direction="down">
         <View style={{justifyContent: 'space-between', width: getWidthPercentage(90), alignItems: 'center', flexDirection: 'row', marginTop: scaleMargin(60)}}>
-          <AnimatedButton onPress={()=>{navigation.navigate('StatsScreen')}}>
-            <WorldSvg fill={Colors.textPrimary} width={30} height={30}/>
-          </AnimatedButton>
+          <TouchableOpacity onPress={()=>{navigation.navigate('StatsScreen')}}>
+            <WorldSvg fill={Colors.textPrimary} />
+          </TouchableOpacity>
       
           <FadeInView delay={200} direction="up">
             <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
               <PulseView scale={1.1} duration={2000}>
-                <Text style={{fontSize: moderateScale(24), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>
+                <Text style={{fontSize: moderateScale(20), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>
                   {currentStreak}
                 </Text>
               </PulseView>
@@ -158,9 +177,9 @@ export default function SendHelloScreen() {
             </View>
           </FadeInView>
 
-          <AnimatedButton onPress={()=>{navigation.navigate('SettingsScreen')}}>
-            <HumanSvg fill={Colors.textPrimary} width={30} height={30}/>
-          </AnimatedButton>
+          <TouchableOpacity onPress={()=>{navigation.navigate('SettingsScreen')}}>
+            <HumanSvg fill={Colors.textPrimary} />
+          </TouchableOpacity>
         </View>
       </FadeInView>
 
@@ -180,10 +199,10 @@ export default function SendHelloScreen() {
         <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}> {AsyncStorage.getItem('fcm_token')}</Text>
       </TouchableOpacity> */}
       <FadeInView delay={400} direction="up">
-        <View style={{alignItems: 'center', gap: scaleMargin(30), marginTop: -50}}>
+        {remainingPings > 0 ? (<View style={{alignItems: 'center', gap: scaleMargin(30), marginTop: -50}}>
           <FadeInView delay={600} direction="up">
               <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>
-             You can send up to 5 pings per day 
+             You have {remainingPings} pings remaining
             </Text>
           </FadeInView>
           <FadeInView delay={800} direction="up">
@@ -194,7 +213,16 @@ export default function SendHelloScreen() {
               />
             </PulseView>
           </FadeInView>
-        </View>
+        </View>) : (
+          <FadeInView delay={600} direction="up">
+            {/* //272B38 */}
+            <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center', marginBottom: scaleMargin(20)}}>
+             You have no pings remaining
+           </Text>
+           <Image source={require('../../assets/img/inactivepingbutton.png')} style={{width: scaleSize(200), height: scaleSize(200)}} resizeMode='contain'/>
+           
+          </FadeInView>
+        )}
       </FadeInView>
      
 
@@ -202,9 +230,17 @@ export default function SendHelloScreen() {
       <FadeInView delay={1000} direction="up">
         {receivedPings && receivedPings.length > 0 ? (
           <View>
+            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '100%'}}>
             <FadeInView delay={1200} direction="up">
               <Text style={{fontSize: moderateScale(16),textAlign: 'center', fontWeight: 'bold', marginBottom: scaleMargin(20),fontFamily: 'DynaPuff', color: Colors.textPrimary}}>People who pinged you</Text>
             </FadeInView>
+            {showAll && <FadeInView delay={1600 + (displayPings.length * 200)} direction="up">
+                  <TouchableOpacity onPress={handleShowLess} style={{alignSelf: 'center',  marginBottom: scaleMargin(20)}}>
+                    <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent}}>show less</Text>
+                  </TouchableOpacity>
+                </FadeInView>}
+            </View>
+            
 
             {displayPings.map((ping, index) => (
               <AnimatedCard key={ping.id || index} delay={1400 + (index * 200)} pressable={true} onPress={()=>{navigation.navigate('ReceiveHello', {ping})}}>

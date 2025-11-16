@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { Alert, Platform } from 'react-native';
+import { Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import axiosClient from '../api/axiosClient';
 import { onTokenRefresh } from '../api/axiosClient';
 import { useAuth } from '../context/AuthContext';
+import { useModal } from '../context/ModalContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import userManagementApi from '../api/UserManagementApi';
 
@@ -11,6 +12,7 @@ const FCM_TOKEN_KEY = 'fcm_token';
 
 export const useFCM = () => {
   const { user } = useAuth();
+  const { showModal } = useModal();
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const lastSentTokenRef = useRef<string | null>(null);
 
@@ -65,10 +67,11 @@ export const useFCM = () => {
       }
 
       const unsubscribe = messaging().onMessage(async remoteMessage => {
-        Alert.alert(
-          remoteMessage.notification?.title ?? 'New notification',
-          remoteMessage.notification?.body ?? ''
-        );
+        showModal({
+          title: remoteMessage.notification?.title ?? 'New notification',
+          message: remoteMessage.notification?.body ?? '',
+          type: 'info',
+        });
       });
 
       unsubscribeRef.current = unsubscribe;

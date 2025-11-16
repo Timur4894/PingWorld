@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { HapticTouchableOpacity } from '../../components/HapticTouchableOpacity';
 import { useNavigation } from '@react-navigation/native';
@@ -10,6 +10,7 @@ import { Colors } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
 import { useModal } from '../../context/ModalContext';
 import CountryPickerModal, { Country } from '../../components/CountryPickerModal';
+import EULAModal from '../../components/EULAModal';
 import { moderateScale, scalePadding, scaleMargin, scaleBorderRadius, getWidthPercentage, scaleSize } from '../../utils/scaling';
 import LottieView from 'lottie-react-native';
 
@@ -24,30 +25,41 @@ export default function SignUpScreen() {
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [isCountryPickerVisible, setIsCountryPickerVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [eulaAccepted, setEulaAccepted] = useState(false);
+  const [showEULAModal, setShowEULAModal] = useState(false);
+  const [errors, setErrors] = useState({
+    nickname: false,
+    password: false,
+    contact: false,
+    country: false,
+  });
+
+  const validateFields = () => {
+    const newErrors = {
+      nickname: !nickname.trim(),
+      password: !password.trim(),
+      contact: !contact.trim(),
+      country: !selectedCountry,
+    };
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error);
+  };
 
   const onSignUp = async () => {
-    if (!nickname.trim()) {
+    if (!eulaAccepted) {
       showModal({
-        title: 'Error',
-        message: 'Please enter your nickname',
+        title: 'Terms Required',
+        message: 'You must accept the Terms of Service to create an account. Please read and accept the terms.',
         type: 'error',
       });
-      return;
-    }
-    
-    if (!password.trim()) {
-      showModal({
-        title: 'Error',
-        message: 'Please enter your password',
-        type: 'error',
-      });
+      setShowEULAModal(true);
       return;
     }
 
-    if (!contact.trim()) {
+    if (!validateFields()) {
       showModal({
-        title: 'Error',
-        message: 'Please enter your contact link',
+        title: 'Please fill all fields',
+        message: 'Please fill in all required fields to continue.',
         type: 'error',
       });
       return;
@@ -92,11 +104,15 @@ export default function SignUpScreen() {
   };
 
 
+  const Container = Platform.OS === 'ios' ? KeyboardAvoidingView : View;
+  const containerProps = Platform.OS === 'ios' 
+    ? { behavior: 'padding' as const, keyboardVerticalOffset: 0 }
+    : {};
+
   return (
-    <KeyboardAvoidingView 
+    <Container 
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      {...containerProps}
     >
       <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
       <ScrollView 
@@ -124,14 +140,28 @@ export default function SignUpScreen() {
             label="Nickname"
             placeholder="Paste your socials link here"
             value={nickname}
-            onChangeText={setNickname}
+            onChangeText={(text) => {
+              setNickname(text);
+              if (errors.nickname) {
+                setErrors(prev => ({ ...prev, nickname: false }));
+              }
+            }}
+            error={errors.nickname}
+            errorMessage={errors.nickname ? "Please enter your nickname" : undefined}
           />
 
           <InputField
             label="Contact link"
             placeholder="Enter your contact link"
             value={contact}
-            onChangeText={setContact}
+            onChangeText={(text) => {
+              setContact(text);
+              if (errors.contact) {
+                setErrors(prev => ({ ...prev, contact: false }));
+              }
+            }}
+            error={errors.contact}
+            errorMessage={errors.contact ? "Please enter your contact link" : undefined}
           />
           
           <InputField
@@ -139,16 +169,24 @@ export default function SignUpScreen() {
             placeholder="Enter your password"
             secureTextEntry
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text) => {
+              setPassword(text);
+              if (errors.password) {
+                setErrors(prev => ({ ...prev, password: false }));
+              }
+            }}
+            error={errors.password}
+            errorMessage={errors.password ? "Please enter your password" : undefined}
           />
           
-          <HapticTouchableOpacity
-            style={styles.countrySelector}
-            onPress={() => setIsCountryPickerVisible(true)}
-            hapticType="light"
-          >
+          <View style={styles.countrySelectorContainer}>
             <Text style={styles.countryLabel}>Country</Text>
-            <View style={styles.countrySelectorContent}>
+            <HapticTouchableOpacity
+              style={styles.countrySelector}
+              onPress={() => setIsCountryPickerVisible(true)}
+              hapticType="light"
+            >
+              <View style={[styles.countrySelectorContent, errors.country && styles.countrySelectorError]}>
               {selectedCountry ? (
                 <>
                   <Text style={styles.countryFlag}>{selectedCountry.flag}</Text>
@@ -160,12 +198,43 @@ export default function SignUpScreen() {
               <Text style={styles.arrow}>▼</Text>
             </View>
           </HapticTouchableOpacity>
+          {errors.country && (
+            <Text style={styles.errorText}>Please select your country</Text>
+          )}
+          </View>
       
           <HapticTouchableOpacity onPress={()=>{navigation.replace('Login')}} hapticType="light">
               <Text style={styles.signUpText}>
               Already have an account? <Text style={styles.signUpLink}>Log in</Text>
               </Text>
           </HapticTouchableOpacity>
+
+          <View style={styles.eulaContainer}>
+            <View style={styles.eulaCheckbox}>
+              <HapticTouchableOpacity
+                onPress={() => {
+                  if (!eulaAccepted) {
+                    setEulaAccepted(true);
+                  } else {
+                    setEulaAccepted(false);
+                  }
+                }}
+                hapticType="light"
+              >
+                <View style={[styles.checkbox, eulaAccepted && styles.checkboxChecked]}>
+                  {eulaAccepted && <Text style={styles.checkmark}>✓</Text>}
+                </View>
+              </HapticTouchableOpacity>
+              <View style={styles.eulaTextContainer}>
+                <Text style={styles.eulaText}>
+                  I accept the{' '}
+                </Text>
+                <HapticTouchableOpacity onPress={() => setShowEULAModal(true)} hapticType="light">
+                  <Text style={styles.eulaLink}>Terms of Service</Text>
+                </HapticTouchableOpacity>
+              </View>
+            </View>
+          </View>
          
         </View>
         </View>
@@ -173,17 +242,31 @@ export default function SignUpScreen() {
         <GradientButton
           title={isLoading ? "Creating..." : "Save"}
           onPress={onSignUp}
-          disabled={isLoading}
+          disabled={isLoading || !eulaAccepted}
         />
       </ScrollView>
       
       <CountryPickerModal
         visible={isCountryPickerVisible}
         selectedCountry={selectedCountry}
-        onSelect={setSelectedCountry}
+        onSelect={(country) => {
+          setSelectedCountry(country);
+          if (errors.country) {
+            setErrors(prev => ({ ...prev, country: false }));
+          }
+          setIsCountryPickerVisible(false);
+        }}
         onClose={() => setIsCountryPickerVisible(false)}
       />
-    </KeyboardAvoidingView>
+
+      <EULAModal
+        visible={showEULAModal}
+        onClose={() => {
+          setShowEULAModal(false);
+        }}
+        
+      />
+    </Container>
   );
 }
 
@@ -234,9 +317,12 @@ const styles = StyleSheet.create({
     color: Colors.textAccent,
     fontWeight: 'bold',
   },
-  countrySelector: {
+  countrySelectorContainer: {
     width: '100%',
     marginVertical: scaleMargin(10),
+  },
+  countrySelector: {
+    width: '100%',
   },
   countryLabel: {
     fontFamily: 'DynaPuff',
@@ -250,11 +336,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderColor: Colors.borderInput,
-
     borderRadius: scaleBorderRadius(20),
     paddingVertical: scalePadding(20),
     paddingHorizontal: scalePadding(16),
     backgroundColor: Colors.cardBackground,
+  },
+  countrySelectorError: {
+    borderColor: Colors.textError,
+    backgroundColor: 'rgba(212, 116, 131, 0.1)',
+  },
+  errorText: {
+    fontFamily: 'DynaPuff',
+    color: Colors.textError,
+    fontSize: moderateScale(12),
+    marginTop: scaleMargin(4),
+    marginLeft: scaleMargin(4),
   },
   countryFlag: {
     fontSize: moderateScale(24),
@@ -276,6 +372,54 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(12),
     color: Colors.textSecondary,
     marginLeft: scaleMargin(8),
+  },
+  eulaContainer: {
+    width: '100%',
+    marginTop: scaleMargin(20),
+    marginBottom: scaleMargin(10),
+  },
+  eulaCheckbox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  eulaTextContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  checkbox: {
+    width: scaleSize(24),
+    height: scaleSize(24),
+    borderWidth: 2,
+    borderColor: Colors.borderInput,
+    borderRadius: scaleBorderRadius(6),
+    backgroundColor: Colors.cardBackground,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: scaleMargin(12),
+  },
+  checkboxChecked: {
+    backgroundColor: Colors.accent,
+    borderColor: Colors.accent,
+  },
+  checkmark: {
+    color: Colors.textPrimary,
+    fontSize: moderateScale(16),
+    fontWeight: 'bold',
+  },
+  eulaText: {
+    flex: 1,
+    fontSize: moderateScale(14),
+    fontFamily: 'DynaPuff',
+    color: Colors.textSecondary,
+    lineHeight: scaleSize(20),
+  },
+  eulaLink: {
+    color: Colors.textAccent,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 });
 

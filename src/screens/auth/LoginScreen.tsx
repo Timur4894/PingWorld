@@ -20,21 +20,25 @@ export default function LoginScreen() {
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({
+    nickname: false,
+    password: false,
+  });
+
+  const validateFields = () => {
+    const newErrors = {
+      nickname: !nickname.trim(),
+      password: !password.trim(),
+    };
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error);
+  };
 
   const onLogin = async () => {
-    if (!nickname.trim()) {
+    if (!validateFields()) {
       showModal({
-        title: 'Error',
-        message: 'Please enter your nickname',
-        type: 'error',
-      });
-      return;
-    }
-    
-    if (!password.trim()) {
-      showModal({
-        title: 'Error',
-        message: 'Please enter your password',
+        title: 'Please fill all fields',
+        message: 'Please fill in all required fields to continue.',
         type: 'error',
       });
       return;
@@ -76,11 +80,15 @@ export default function LoginScreen() {
     }
   };
 
+  const Container = Platform.OS === 'ios' ? KeyboardAvoidingView : View;
+  const containerProps = Platform.OS === 'ios' 
+    ? { behavior: 'padding' as const, keyboardVerticalOffset: 0 }
+    : {};
+
   return (
-    <KeyboardAvoidingView 
+    <Container 
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      {...containerProps}
     >
       <Image source={require('../../assets/img/PurpleShadow.png')} style={styles.backgroundImage} resizeMode='stretch'/>
       <ScrollView 
@@ -108,7 +116,14 @@ export default function LoginScreen() {
               label="Nickname"
               placeholder="Enter your nickname"
               value={nickname}
-              onChangeText={setNickname}
+              onChangeText={(text) => {
+                setNickname(text);
+                if (errors.nickname) {
+                  setErrors(prev => ({ ...prev, nickname: false }));
+                }
+              }}
+              error={errors.nickname}
+              errorMessage={errors.nickname ? "Please enter your nickname" : undefined}
             />
             
             <InputField
@@ -116,7 +131,14 @@ export default function LoginScreen() {
               placeholder="Enter your password"
               secureTextEntry
               value={password}
-              onChangeText={setPassword}
+              onChangeText={(text) => {
+                setPassword(text);
+                if (errors.password) {
+                  setErrors(prev => ({ ...prev, password: false }));
+                }
+              }}
+              error={errors.password}
+              errorMessage={errors.password ? "Please enter your password" : undefined}
             />
             <HapticTouchableOpacity onPress={() => navigation.replace('SignUpScreen')} hapticType="light">
               <Text style={styles.signUpText}>
@@ -133,7 +155,7 @@ export default function LoginScreen() {
           disabled={isLoading}
         />
       </ScrollView>
-    </KeyboardAvoidingView>
+    </Container>
   );
 }
 

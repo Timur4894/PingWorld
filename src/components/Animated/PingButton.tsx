@@ -258,9 +258,8 @@ const PingButton: React.FC<PingButtonProps> = ({
               transform: [{ rotate: smallCircleRotate }],
             }}
           >
-            <SmallCircle 
-             
-            />
+            <SmallCircle/>
+          
           </Animated.View>
           <Animated.View
             style={{
@@ -282,13 +281,10 @@ const PingButton: React.FC<PingButtonProps> = ({
               transform: [{ rotate: midCircleRotate }],
             }}
           >
-            <MidCircle 
-            
-            
-            />
+            <MidCircle/>
           </Animated.View>
-          {/* <Text style={styles.textButton}>Ping</Text> */}
-          {isPressing && (
+          <Text style={styles.textButton}>Ping</Text>
+          {/* {isPressing && (
             <View style={styles.progressContainer}>
               <Animated.View
                 style={[
@@ -299,7 +295,7 @@ const PingButton: React.FC<PingButtonProps> = ({
                 ]}
               />
             </View>
-          )}
+          )} */}
         </View>
       </Animated.View>
       
@@ -359,7 +355,9 @@ const styles = StyleSheet.create({
   textButton: {
     fontSize: moderateScale(26),
     fontFamily: 'DynaPuff',
-    alignSelf: 'center',
+    position: 'absolute',
+    top: scaleSize(80),
+    // alignSelf: 'center',
     // marginTop: 20,
     color: Colors.textPrimary,
     fontWeight: 'bold',

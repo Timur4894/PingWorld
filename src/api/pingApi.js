@@ -11,6 +11,8 @@ const pingApi = {
     axiosClient.get('/api/v1/ping/received', {
       params: { page, limit },
     }),
+
+  getRemainingPings: () => axiosClient.get('/api/v1/ping/remaining-count'),
 };
 
 export default pingApi;

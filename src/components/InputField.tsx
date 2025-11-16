@@ -10,22 +10,24 @@ interface InputFieldProps extends TextInputProps {
   secureTextEntry?: boolean;
   value?: string;
   onChangeText?: (text: string) => void;
+  error?: boolean;
+  errorMessage?: string;
 }
 
-const InputField = ({ label, placeholder, secureTextEntry = false, value, onChangeText, ...props }: InputFieldProps) => {
+const InputField = ({ label, placeholder, secureTextEntry = false, value, onChangeText, error = false, errorMessage, ...props }: InputFieldProps) => {
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
       <LinearGradient
-        colors={['#1F43B7', '#FBF3F3', '#1A3AB5']}
+        colors={error ? ['#D47483', '#D47483', '#D47483'] : ['#1F43B7', '#FBF3F3', '#1A3AB5']}
         locations={[0.25, 0.52, 0.97]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
-        style={styles.gradientBorder}
+        style={[styles.gradientBorder, error && styles.gradientBorderError]}
       >
         <View style={styles.innerContainer}>
           <TextInput
-            style={styles.input}
+            style={[styles.input, error && styles.inputError]}
             placeholder={placeholder}
             placeholderTextColor="rgba(255,255,255,0.6)"
             secureTextEntry={secureTextEntry}
@@ -35,6 +37,9 @@ const InputField = ({ label, placeholder, secureTextEntry = false, value, onChan
           />
         </View>
       </LinearGradient>
+      {error && errorMessage && (
+        <Text style={styles.errorText}>{errorMessage}</Text>
+      )}
     </View>
   );
 };
@@ -71,6 +76,19 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     overflow: "hidden",
     backgroundColor: Colors.cardBackground,
+  },
+  inputError: {
+    backgroundColor: 'rgba(212, 116, 131, 0.1)',
+  },
+  gradientBorderError: {
+    opacity: 1,
+  },
+  errorText: {
+    fontFamily: 'DynaPuff',
+    color: Colors.textError,
+    fontSize: moderateScale(12),
+    marginTop: scaleMargin(4),
+    marginLeft: scaleMargin(4),
   },
 });
 
