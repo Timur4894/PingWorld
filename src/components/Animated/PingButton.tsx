@@ -14,6 +14,10 @@ interface PingButtonProps {
   pingsRemaining?: number;
 }
 
+const HOLD_DURATION_MS = 2500;
+const PROGRESS_INTERVAL_MS = 100;
+const PROGRESS_INCREMENT = PROGRESS_INTERVAL_MS / HOLD_DURATION_MS;
+
 const PingButton: React.FC<PingButtonProps> = ({
   onPingSent,
   disabled = false,
@@ -54,7 +58,7 @@ const PingButton: React.FC<PingButtonProps> = ({
 
     Animated.timing(progressValue, {
       toValue: 1,
-      duration: 4000,
+      duration: HOLD_DURATION_MS,
       useNativeDriver: false,
     }).start(({ finished }) => {
       if (finished) {
@@ -99,7 +103,7 @@ const PingButton: React.FC<PingButtonProps> = ({
 
     const progressInterval = setInterval(() => {
       setProgress(prev => {
-        const newProgress = prev + 0.025;
+        const newProgress = prev + PROGRESS_INCREMENT;
         currentProgressRef.current = newProgress;
         if (newProgress >= 1) {
           clearInterval(progressInterval);
@@ -253,7 +257,7 @@ const PingButton: React.FC<PingButtonProps> = ({
           <Animated.View
             style={{
               position: 'absolute',
-              top: 0,
+              // top: 0,
               alignSelf: 'center',
               transform: [{ rotate: smallCircleRotate }],
             }}
@@ -264,26 +268,28 @@ const PingButton: React.FC<PingButtonProps> = ({
           <Animated.View
             style={{
               position: 'absolute',
-              top: scaleSize(25),
+              // top: scaleSize(25),
               alignSelf: 'center',
               transform: [{ rotate: bigCircleRotate }],
             }}
           >
             <BigCircle 
-             
             />
           </Animated.View>
           <Animated.View
             style={{
               position: 'absolute',
-              top: scaleSize(40),
+              // top: scaleSize(40),
               alignSelf: 'center',
               transform: [{ rotate: midCircleRotate }],
             }}
           >
             <MidCircle/>
           </Animated.View>
+
           <Text style={styles.textButton}>Ping</Text>
+
+          {/* <Text style={styles.textButton}>Ping</Text> */}
           {/* {isPressing && (
             <View style={styles.progressContainer}>
               <Animated.View
@@ -322,6 +328,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
+    top: scaleSize(10),
     width: getWidthPercentage(45),
     height: getHeightPercentage(20),
   },
@@ -356,7 +363,7 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(26),
     fontFamily: 'DynaPuff',
     position: 'absolute',
-    top: scaleSize(80),
+    // top: scaleSize(80),
     // alignSelf: 'center',
     // marginTop: 20,
     color: Colors.textPrimary,

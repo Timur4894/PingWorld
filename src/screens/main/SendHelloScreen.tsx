@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, Image, Clipboard, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useCallback,  } from 'react';
+import { View, Text, StyleSheet, Image, Clipboard, TouchableOpacity, ScrollView } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../navigation/MainStack';
@@ -201,11 +201,15 @@ export default function SendHelloScreen() {
       <FadeInView delay={400} direction="up">
         {remainingPings > 0 ? (<View style={{alignItems: 'center', gap: scaleMargin(30), marginTop: -50}}>
           <FadeInView delay={600} direction="up">
-              <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>
-             You have {remainingPings} pings remaining
+              <Text style={{fontSize: moderateScale(18), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center'}}>
+              Pings left today:{'  '}    
+              <Text style={{fontSize: moderateScale(18), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.accent, textAlign: 'center'}}>
+                {remainingPings}
+
+              </Text>
             </Text>
           </FadeInView>
-          <FadeInView delay={800} direction="up">
+          <FadeInView delay={800} direction="up" style={{marginTop: 50}}>
             <PulseView scale={1.05} duration={3000}>
               <PingButton 
                 onPingSent={handlePingSent}
@@ -216,10 +220,13 @@ export default function SendHelloScreen() {
         </View>) : (
           <FadeInView delay={600} direction="up">
             {/* //272B38 */}
-            <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center', marginBottom: scaleMargin(20)}}>
-             You have no pings remaining
+            <Text style={{fontSize: moderateScale(18), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary, textAlign: 'center', marginBottom: scaleMargin(20)}}>
+              Pings left today:{'  '} 
+              <Text style={{fontSize: moderateScale(18), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textError, textAlign: 'center', marginBottom: scaleMargin(20)}}>
+                {remainingPings}
+            </Text>
            </Text>
-           <Image source={require('../../assets/img/inactivepingbutton.png')} style={{width: scaleSize(200), height: scaleSize(200)}} resizeMode='contain'/>
+           <Image source={require('../../assets/img/inactivepingbutton.png')} style={{width: scaleSize(200), height: scaleSize(200), marginTop: 50}} resizeMode='contain'/>
            
           </FadeInView>
         )}
@@ -231,26 +238,28 @@ export default function SendHelloScreen() {
         {receivedPings && receivedPings.length > 0 ? (
           <View>
             <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '100%'}}>
-            <FadeInView delay={1200} direction="up">
-              <Text style={{fontSize: moderateScale(16),textAlign: 'center', fontWeight: 'bold', marginBottom: scaleMargin(20),fontFamily: 'DynaPuff', color: Colors.textPrimary}}>People who pinged you</Text>
-            </FadeInView>
-            {showAll && <FadeInView delay={1600 + (displayPings.length * 200)} direction="up">
+              <FadeInView delay={1200} direction="up">
+                <Text style={{fontSize: moderateScale(16),textAlign: 'center', fontWeight: 'bold', marginBottom: scaleMargin(20),fontFamily: 'DynaPuff', color: Colors.textPrimary}}>People who pinged you</Text>
+              </FadeInView>
+              {showAll && <FadeInView delay={1600 + (displayPings.length * 200)} direction="up">
                   <TouchableOpacity onPress={handleShowLess} style={{alignSelf: 'center',  marginBottom: scaleMargin(20)}}>
                     <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent}}>show less</Text>
                   </TouchableOpacity>
-                </FadeInView>}
+              </FadeInView>}
             </View>
-            
 
-            {displayPings.map((ping, index) => (
-              <AnimatedCard key={ping.id || index} delay={1400 + (index * 200)} pressable={true} onPress={()=>{navigation.navigate('ReceiveHello', {ping})}}>
-                <View style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: scaleBorderRadius(22), padding: scalePadding(16), alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row', marginBottom: scaleMargin(10)}}>
-                  <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>{ping.sender_nickname}</Text>
-                
-                    <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, }}>view profile</Text>
-                </View>
-              </AnimatedCard>
-            ))}
+            {/* <ScrollView> */}
+              {displayPings.map((ping, index) => (
+                <AnimatedCard key={ping.id || index} delay={1400 + (index * 200)} pressable={true} onPress={()=>{navigation.navigate('ReceiveHello', {ping})}}>
+                  <View style={{width: '100%', backgroundColor: Colors.cardBackground, borderRadius: scaleBorderRadius(22), padding: scalePadding(16), alignItems: 'center', borderWidth: 1, borderColor: Colors.cardBorder, justifyContent: 'space-between', flexDirection: 'row', marginBottom: scaleMargin(10)}}>
+                    <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textPrimary}}>{ping.sender_nickname}</Text>
+                      <Text style={{fontSize: moderateScale(16), fontWeight: 'bold', fontFamily: 'DynaPuff', color: Colors.textAccent, }}>view profile</Text>
+                  </View>
+                </AnimatedCard>
+              ))}
+            {/* </ScrollView> */}
+
+            
             
             {receivedPings.length > 2 && !showAll && (
               <FadeInView delay={1600 + (displayPings.length * 200)} direction="up">

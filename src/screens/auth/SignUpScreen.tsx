@@ -131,7 +131,7 @@ export default function SignUpScreen() {
                 loop={true}
                 speed={1}
               
-                style={{ width: scaleSize(100), height: scaleSize(100) }}
+                style={{ width: scaleSize(50), height: scaleSize(50) }}
               />   
         </View>
         
@@ -288,15 +288,17 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   header: {
-    width: '100%',
+    width: '90%',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
     marginTop: scaleMargin(20),
     marginBottom: scaleMargin(40),
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    // justifyContent: 'center',
   },
   title: { 
-    fontSize: moderateScale(38), 
+    fontSize: moderateScale(32), 
     fontWeight: '800', 
     fontFamily: 'DynaPuff',
     color: Colors.textPrimary,
